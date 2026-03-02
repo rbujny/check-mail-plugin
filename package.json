@@ -1,0 +1,23 @@
+{
+  "name": "checkmailplugin",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && esbuild src/content/index.ts --bundle --outfile=dist/content.js --format=iife && esbuild src/content/show-original-index.ts --bundle --outfile=dist/show-original-content.js --format=iife",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "@tsconfig/svelte": "^5.0.6",
+    "@types/chrome": "^0.1.37",
+    "@types/node": "^24.10.1",
+    "esbuild": "^0.27.3",
+    "svelte": "^5.45.2",
+    "svelte-check": "^4.3.4",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1"
+  }
+}
