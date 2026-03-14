@@ -6,6 +6,7 @@
  */
 
 import { injectIcons, cleanupIcons } from './icon-injector';
+import { setupMessageListener } from './toast';
 
 /**
  * Debounce utility to prevent excessive DOM processing during
@@ -46,6 +47,9 @@ function init(): void {
     }
 
     console.log('[CheckMailPlugin] Content script loaded on Gmail.');
+
+    // Setup listener for background responses (like errors)
+    setupMessageListener();
 
     // Initial scan in case an email is already open
     processEmailView();

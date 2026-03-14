@@ -177,10 +177,10 @@ function preprocessLinks(bodyElement: HTMLElement): void {
             return;
         }
 
-        // Replace the link with "text (url)" format
-        const replacement = document.createTextNode(
-            text ? `${text} (${href})` : href
-        );
+        // Replace the link with " text (url) " or " url " format
+        // Padding with spaces guarantees separation from adjacent text when reading innerText
+        const replacementText = text ? ` ${text} (${href}) ` : ` ${href} `;
+        const replacement = document.createTextNode(replacementText);
         link.replaceWith(replacement);
     });
 }

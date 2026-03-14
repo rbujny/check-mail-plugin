@@ -5,7 +5,9 @@
     "description": "Phishing detection assistant — extracts email content from Gmail for analysis.",
     "permissions": [],
     "host_permissions": [
-        "https://mail.google.com/*"
+        "https://mail.google.com/*",
+        "http://localhost:8080/*",
+        "http://127.0.0.1:8080/*"
     ],
     "content_scripts": [
         {

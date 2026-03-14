@@ -1,10 +1,9 @@
-/**
- * Injector logic for Gmail's "Show Original" view.
- */
-
 import { extractOriginalContent } from './show-original-extractor';
-import { logExtractionResult } from '../utils/logger';
 import { ICON_MARKER, SHIELD_ICON_SVG } from './icon-injector';
+import { optimizeEmailData } from './email-data-optimizer';
+import { decodeQuotedPrintable } from '../utils/sanitizer';
+import { extractBodyFromMime } from '../utils/mime-parser';
+import type { ExtendedEmailData } from '../types/email';
 
 /**
  * Finds the native toolbar in the Show Original view.
@@ -85,7 +84,32 @@ function createShieldButton(): HTMLButtonElement {
             // Allow synchronous thread offloading visual feedback
             await new Promise(resolve => setTimeout(resolve, 0));
 
-            logExtractionResult(result);
+            // Build optimized payload through the data optimizer
+            let rawHeaders: Record<string, string | string[]> = {};
+            if ('headers' in result.data) {
+                rawHeaders = (result.data as ExtendedEmailData).headers;
+            } else {
+                rawHeaders = {
+                    'From': result.data.from,
+                    'To': result.data.to.join(', '),
+                    'Subject': result.data.subject,
+                    'Date': result.data.date
+                };
+            }
+
+            let rawBody = ('rawBody' in result.data)
+                ? (result.data as ExtendedEmailData).rawBody
+                : result.data.bodyText;
+
+            // Extract the core HTML or Plain text part, discarding MIME boundary wrappers
+            const extractedPart = extractBodyFromMime(rawBody);
+
+            // Decode Quoted-Printable format natively
+            const decodedBody = decodeQuotedPrintable(extractedPart);
+
+            const payload = optimizeEmailData(rawHeaders, decodedBody);
+
+            chrome.runtime.sendMessage({ type: 'PROCESS_EMAIL', payload });
 
             button.style.color = '#34a853'; // success
         } catch (error) {

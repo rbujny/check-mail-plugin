@@ -9,7 +9,8 @@
  */
 
 import { extractEmailContent } from './email-extractor';
-import { logExtractionResult } from '../utils/logger';
+import { optimizeEmailData } from './email-data-optimizer';
+import type { ExtendedEmailData } from '../types/email';
 
 /** Marker attribute to identify injected icons */
 export const ICON_MARKER = 'data-checkmail-injected';
@@ -151,7 +152,31 @@ function createIconButton(messageContainer: HTMLElement): HTMLButtonElement {
 
         try {
             const result = extractEmailContent(messageContainer);
-            logExtractionResult(result);
+
+            // Build optimized payload through the data optimizer
+            let rawHeaders: Record<string, string | string[]> = {};
+            if ('headers' in result.data) {
+                rawHeaders = (result.data as ExtendedEmailData).headers;
+            } else {
+                // Simplified view: construct headers from parsed fields
+                rawHeaders = {
+                    'From': result.data.from,
+                    'To': result.data.to.join(', '),
+                    'Subject': result.data.subject,
+                    'Date': result.data.date
+                };
+            }
+
+            const rawBody = result.data.bodyText;
+            const payload = optimizeEmailData(rawHeaders, rawBody);
+
+            if (result.success) {
+                chrome.runtime.sendMessage({ type: 'PROCESS_EMAIL', payload });
+            } else {
+                console.warn('[CheckMailPlugin] Extraction completed with warnings', result.warnings);
+                chrome.runtime.sendMessage({ type: 'PROCESS_EMAIL', payload });
+            }
+
 
             // Visual feedback: success
             button.style.color = '#34a853';

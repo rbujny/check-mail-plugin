@@ -25,8 +25,8 @@ export interface EmailData {
  * and granular parsed MIME entities.
  */
 export interface ExtendedEmailData extends EmailData {
-    /** Raw headers dictionary from the MIME payload */
-    headers: Record<string, string>;
+    /** Raw headers dictionary from the MIME payload. Duplicate keys (e.g. Received) are stored as string[] */
+    headers: Record<string, string | string[]>;
     /** The structured HTML or multipart body content if deciphered */
     rawBody: string;
     /** Collection of parsed attachments or extra bounds */
@@ -50,4 +50,31 @@ export interface ExtractionResult {
     data: EmailData | ExtendedEmailData;
     /** Warning flag if > 5MB handling thresholds reached */
     rawSize?: number;
+}
+
+/**
+ * ProcessedEmailData is the optimized, privacy-respecting payload
+ * produced by the email-data-optimizer before transmission.
+ *
+ * Raw cryptographic signatures (arc-seal, dkim-signature, etc.) are
+ * stripped. Only targeting headers and parsed security verdicts are kept.
+ * The body is URL-extracted, whitespace-normalized, and truncated.
+ */
+export interface ProcessedEmailData {
+    /** Only selected headers: to, from, subject, reply-to. Keys are lowercase. */
+    headers: Record<string, string>;
+    /** Ordered list of Received header values from the original email */
+    receivedChain: string[];
+    /** Parsed authentication-results verdicts (SPF, DKIM, DMARC) */
+    securityVerdicts: {
+        spf?: string;
+        dkim?: string;
+        dmarc?: string;
+    };
+    /** Normalized email body. Max 1000 chars, URLs replaced by [LINK] */
+    body: string;
+    /** True if the body was truncated to fit the max length */
+    truncated: boolean;
+    /** Deduplicated list of URLs (http, https, mailto, data schemes) extracted from the raw email body */
+    links: string[];
 }

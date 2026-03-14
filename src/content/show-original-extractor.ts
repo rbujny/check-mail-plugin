@@ -35,14 +35,33 @@ function extractRawText(): string | null {
  * Parses raw MIME string into ExtendedEmailData structure.
  * This is a lightweight parser conforming to memory thresholds.
  */
-function parseMimeData(rawText: string): ExtendedEmailData {
+export function parseMimeData(rawText: string): ExtendedEmailData {
     const lines = rawText.split('\n');
-    const headers: Record<string, string> = {};
+    const headers: Record<string, string | string[]> = {};
     let rawBody = '';
 
     let isHeaderSection = true;
     let currentHeaderKey: string | null = null;
     let currentHeaderValue = '';
+
+    /**
+     * Flushes the current header key/value pair into the headers record.
+     * If the key already exists, it is converted to/appended as a string array
+     * (to support duplicate headers like Received).
+     */
+    function flushHeader(): void {
+        if (!currentHeaderKey) return;
+        const val = currentHeaderValue.trim();
+        const existing = headers[currentHeaderKey];
+
+        if (existing === undefined) {
+            headers[currentHeaderKey] = val;
+        } else if (Array.isArray(existing)) {
+            existing.push(val);
+        } else {
+            headers[currentHeaderKey] = [existing, val];
+        }
+    }
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
@@ -50,9 +69,7 @@ function parseMimeData(rawText: string): ExtendedEmailData {
         if (isHeaderSection) {
             // Empty line marks end of headers
             if (line.trim() === '') {
-                if (currentHeaderKey) {
-                    headers[currentHeaderKey] = currentHeaderValue.trim();
-                }
+                flushHeader();
                 isHeaderSection = false;
                 continue;
             }
@@ -67,9 +84,7 @@ function parseMimeData(rawText: string): ExtendedEmailData {
                 const separatorIndex = line.indexOf(':');
                 if (separatorIndex > 0) {
                     // Flush previous
-                    if (currentHeaderKey) {
-                        headers[currentHeaderKey] = currentHeaderValue.trim();
-                    }
+                    flushHeader();
 
                     // Start new header
                     currentHeaderKey = line.substring(0, separatorIndex).trim().toLowerCase();
@@ -87,8 +102,15 @@ function parseMimeData(rawText: string): ExtendedEmailData {
         }
     }
 
+    // Helper to get a single string value from a header that may be an array
+    const getFirst = (key: string): string => {
+        const v = headers[key];
+        if (!v) return '';
+        return Array.isArray(v) ? v[0] : v;
+    };
+
     // Fallback extraction from headers if available
-    const fromStr = headers['from'] || '';
+    const fromStr = getFirst('from');
 
     // Parse 'To' and 'Cc' which could be comma-separated
     const parseEmails = (str: string) => {
@@ -96,11 +118,11 @@ function parseMimeData(rawText: string): ExtendedEmailData {
         return str.split(',').map(e => e.trim()).filter(Boolean);
     };
 
-    const toStrArray = parseEmails(headers['to']);
-    const ccStrArray = parseEmails(headers['cc']);
+    const toStrArray = parseEmails(getFirst('to'));
+    const ccStrArray = parseEmails(getFirst('cc'));
 
-    const subjectStr = headers['subject'] || '';
-    const dateStr = headers['date'] || '';
+    const subjectStr = getFirst('subject');
+    const dateStr = getFirst('date');
 
     // Standard fallback mapping
     return {

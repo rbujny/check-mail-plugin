@@ -3,9 +3,12 @@
  */
 
 import { injectOriginalIcon } from './show-original-injector';
+import { setupMessageListener } from './toast';
 
 function initOriginalView(): void {
     console.log('[CheckMailPlugin] Original View loaded.');
+
+    setupMessageListener();
 
     // Inject immediately
     injectOriginalIcon();

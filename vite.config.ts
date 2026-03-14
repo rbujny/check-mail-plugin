@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { resolve } from 'path'
 
@@ -17,5 +17,9 @@ export default defineConfig({
     // Output to dist/ for sideloading
     outDir: 'dist',
     emptyOutDir: true,
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
   },
 })
