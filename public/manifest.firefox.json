@@ -6,8 +6,6 @@
     "permissions": [],
     "host_permissions": [
         "https://mail.google.com/*",
-        "https://mail.yahoo.com/*",
-        "https://apis.mail.yahoo.com/*",
         "http://localhost:8080/*",
         "http://127.0.0.1:8080/*"
     ],
@@ -29,16 +27,6 @@
                 "show-original-content.js"
             ],
             "run_at": "document_idle"
-        },
-        {
-            "matches": [
-                "https://mail.yahoo.com/*",
-                "https://apis.mail.yahoo.com/*"
-            ],
-            "js": [
-                "yahoo-content.js"
-            ],
-            "run_at": "document_idle"
         }
     ],
     "action": {
@@ -46,6 +34,14 @@
         "default_popup": "index.html"
     },
     "background": {
-        "service_worker": "service-worker.js"
+        "scripts": [
+            "service-worker.js"
+        ]
+    },
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "radoslaw.bujny@gmail.com",
+            "strict_min_version": "109.0"
+        }
     }
 }

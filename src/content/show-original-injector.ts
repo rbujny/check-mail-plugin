@@ -10,18 +10,39 @@ import type { ExtendedEmailData } from '../types/email';
  * Usually a table cell (.ma a) or immediate container holding download/print buttons.
  */
 function findActionRow(): HTMLElement | null {
-    // Attempt 1: Look for container where 'Download Original' resides
-    const downloadBtns = Array.from(document.querySelectorAll('a')).filter(a =>
-        a.textContent?.toLowerCase().includes('download original')
-    );
+    // We know we're on Gmail's "Show Original" page (manifest matches view=om).
+    // The page structure is always:  heading → metadata table → download link → raw source.
+    // The download link points to mail.google.com, while "Learn more" links point to support.google.com.
+    // This approach is 100% language-agnostic — no text matching needed.
 
-    if (downloadBtns.length > 0) {
-        return downloadBtns[0].parentElement;
+    const allAnchors = Array.from(document.querySelectorAll('a'));
+
+    // Attempt 1: Find a link that points to mail.google.com but is NOT inside the metadata table.
+    // This is always the "Download Original" link regardless of language.
+    for (const a of allAnchors) {
+        const href = a.getAttribute('href') || '';
+        const isGmailLink = href.includes('mail.google.com');
+        const isInsideTable = a.closest('table') !== null;
+
+        if (isGmailLink && !isInsideTable) {
+            return a.parentElement;
+        }
     }
 
-    // Attempt 2: General action rows in the header area
-    const tables = document.querySelectorAll<HTMLElement>('table.message tr td');
-    for (const td of tables) {
+    // Attempt 2: Find any link outside the table that is NOT a support/help link.
+    for (const a of allAnchors) {
+        const href = a.getAttribute('href') || '';
+        const isInsideTable = a.closest('table') !== null;
+        const isHelpLink = href.includes('support.google');
+
+        if (!isInsideTable && !isHelpLink && href.length > 0) {
+            return a.parentElement;
+        }
+    }
+
+    // Attempt 3: Last resort — look for table cells with multiple action links
+    const tds = document.querySelectorAll<HTMLElement>('table tr td');
+    for (const td of tds) {
         const links = td.querySelectorAll('a');
         if (links.length > 2) {
             return td;
