@@ -13,9 +13,11 @@ dist-firefox
 dist-ssr
 *.local
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
+# Editor and Agent directories
+.vscode/
+.agent/
+.specify/
+specs/
 .idea
 .DS_Store
 Thumbs.db
