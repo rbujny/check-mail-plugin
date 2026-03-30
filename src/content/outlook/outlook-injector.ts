@@ -1,6 +1,6 @@
 import { extractOutlookEmailContent, extractOutlookRawContent, parseSMTPHeaders } from './outlook-extractor';
-import { ICON_MARKER, SHIELD_ICON_SVG } from '../icon-injector';
-import { optimizeEmailData } from '../email-data-optimizer';
+import { ICON_MARKER, SHIELD_ICON_SVG } from '../gmail/icon-injector';
+import { optimizeEmailData } from '../shared/email-data-optimizer';
 import { extractBodyFromMime } from '../../utils/mime-parser';
 import { decodeQuotedPrintable } from '../../utils/sanitizer';
 
@@ -164,6 +164,14 @@ function createRawShieldButton(): HTMLButtonElement {
         try {
             const rawText = extractOutlookRawContent();
             if (!rawText) throw new Error('No raw text found in dialog');
+
+            // 5 MB threshold warning (FR-008)
+            const rawSize = new Blob([rawText]).size;
+            if (rawSize > SIZE_WARNING_THRESHOLD) {
+                console.warn(
+                    `[CheckMailPlugin][Outlook] Raw payload is large (${(rawSize / 1024 / 1024).toFixed(2)} MB). Processing may be slow.`,
+                );
+            }
 
             const extractedPart = extractBodyFromMime(rawText);
             const decodedBody = decodeQuotedPrintable(extractedPart);

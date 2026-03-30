@@ -10,8 +10,8 @@
  */
 
 import { extractYahooEmailContent, extractYahooRawContent } from './yahoo-extractor';
-import { ICON_MARKER, SHIELD_ICON_SVG } from '../icon-injector';
-import { optimizeEmailData } from '../email-data-optimizer';
+import { ICON_MARKER, SHIELD_ICON_SVG } from '../gmail/icon-injector';
+import { optimizeEmailData } from '../shared/email-data-optimizer';
 import { extractBodyFromMime } from '../../utils/mime-parser';
 import { decodeQuotedPrintable } from '../../utils/sanitizer';
 import type { ExtendedEmailData } from '../../types/email';

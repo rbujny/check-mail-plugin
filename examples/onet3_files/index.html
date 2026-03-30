@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<!-- saved from url=(0070)https://s0.2mdn.net/sadbundle/1980152279680775699/index.html?ev=01_262 -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kreacja testowa</title>
+
+    <link rel="stylesheet" href="./style.css">
+
+    <script>
+        var clickTag1 = "https://ad.doubleclick.net/ddm/trackclk/N996690.5614526BALANSAGENCY/B35326601.441376166;dc_trk_aid=634945660;dc_trk_cid=250788274;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;gdpr=${GDPR};gdpr_consent=${GDPR_CONSENT_755};ltd=;dc_tdv=1";
+    </script>
+
+    <meta name="ad.size" content="width=300,height=600">
+    <script src="./DcmEnabler_01_262.js.pobrane"></script>
+    <script src="./gsap_3.5.1_min.js.pobrane"></script>
+<script type="text/javascript">
+    
+  (function() {
+    var MAX_URL_PARAM_LENGTH = 34;
+    var CLICK_X_URL_KEY = 'nx';
+    var CLICK_Y_URL_KEY = 'ny';
+    var CREATIVE_DIMENSIONS_KEY = 'dim';
+    var AD_URL_PARAM = '&adurl=';
+
+    var relegateNavigation = '';
+    var urlParamMap = {};
+
+    var isNewtonTokenSet = false;
+    var isTurtleXAdClick = false;
+    var reportingIds = {};
+
+    urlParamMap[CLICK_X_URL_KEY] = null;
+    urlParamMap[CLICK_Y_URL_KEY] = null;
+    urlParamMap[CREATIVE_DIMENSIONS_KEY] = null;
+
+    var handleClickTagMessage = function(e) {
+      try {
+        var eventData = JSON.parse(e.data);
+      } catch (err) {
+        return;
+      }
+      if (eventData.isInitClickTag) {
+        if (eventData.clickTags) {
+          for (var i = 0; i < eventData.clickTags.length; i++) {
+            var clkTag = eventData.clickTags[i];
+            window[clkTag.name] = clkTag.url;
+
+            if (clkTag.eTldPlusOne) {
+              eTldPlusOnes[clkTag.url] = clkTag.eTldPlusOne;
+            }
+            if (clkTag.reportingId) {
+              reportingIds[clkTag.url] = clkTag.reportingId;
+            }
+          }
+        } else if (eventData.clickTag) {
+          window.clickTag = eventData.clickTag;
+        }
+        relegateNavigation = eventData.relegateNavigation;
+      }
+      if (isNewtonEnabled(eventData) && !isNewtonTokenSet) {
+        var newtonOt2Token = eventData.newtonOt2Token;
+        enableAttributionReportingApi(newtonOt2Token);
+      }
+      if (eventData.isTurtleXAdClick) {
+        isTurtleXAdClick = true;
+      }
+    };
+
+    var isNewtonEnabled = function(eventData) {
+      return 'newtonOt2Token' in eventData;
+    }
+
+    var enableAttributionReportingApi = function(originTrialToken) {
+      if (/Chrome/.test(window.navigator.userAgent)) {
+        var meta = document.createElement('meta');
+        meta.httpEquiv = 'origin-trial';
+        meta.content = String(originTrialToken);
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        isNewtonTokenSet = true;
+      }
+    };
+
+    var storeClickCoordinates = function(e) {
+      urlParamMap[CLICK_X_URL_KEY] = Math.round(e.clientX);
+      urlParamMap[CLICK_Y_URL_KEY] = Math.round(e.clientY);
+    };
+
+    var getCreativeDimensions = function() {
+      return window.innerWidth + 'x' + window.innerHeight;
+    }
+
+    var getExitClickParams = function(e) {
+      urlParamMap[CREATIVE_DIMENSIONS_KEY] = getCreativeDimensions();
+
+      var exitParams = '';
+      for (var key in urlParamMap) {
+        exitParams += '&' + key + '=';
+        if (urlParamMap[key] !== null) {
+          exitParams += urlParamMap[key];
+        }
+      }
+      return exitParams;
+    }
+
+    var appendExitClickParams = function(url) {
+      var adUrlIndex = url.toLowerCase().indexOf(AD_URL_PARAM);
+      var paramsToBeAdded = getExitClickParams();
+      if (adUrlIndex > -1 && paramsToBeAdded.length <= MAX_URL_PARAM_LENGTH) {
+        url = url.substr(0, adUrlIndex) + paramsToBeAdded +
+          url.substr(adUrlIndex);
+      };
+      return url;
+    };
+
+    if (open.call) {
+      window.open = function(open) {
+        return function(url, name, features) {
+          if (isTurtleXAdClick && !!reportingIds[url]) {
+            var message = {
+              'reportingId': reportingIds[url],
+              'clickX': urlParamMap[CLICK_X_URL_KEY],
+              'clickY': urlParamMap[CLICK_Y_URL_KEY],
+              'creativeDims': getCreativeDimensions()
+              };
+            parent.postMessage(JSON.stringify(message), '*');
+          }
+          url = appendExitClickParams(url);
+          if (relegateNavigation === 'parent') {
+            var message = {'clickTag': url, 'isPostClickTag': true};
+            parent.postMessage(JSON.stringify(message), '*');
+          } else {
+            var args = [url, name];
+            var windowFeatures = '';
+
+            if (features) {
+              windowFeatures = windowFeatures.concat(features);
+            }
+            if (isNewtonTokenSet &&
+                !!document.featurePolicy?.allowedFeatures().includes(
+                  'attribution-reporting')) {
+              if (features) {
+                if (!features.includes('attributionsrc')) {
+                  windowFeatures = windowFeatures.concat(features, ', attributionsrc');
+                }
+              } else {
+                windowFeatures = windowFeatures.concat('attributionsrc');
+              }
+            }
+
+            if (windowFeatures) {
+              args.push(windowFeatures);
+            }
+            open.apply(window,args);
+          }
+        };
+      }(window.open);
+    }
+
+    if (window.addEventListener) {
+      window.addEventListener(
+          'message', handleClickTagMessage, false);
+      window.addEventListener('mousedown', storeClickCoordinates, true);
+    } else {
+      window.attachEvent('onmessage', handleClickTagMessage);
+    }
+  })();
+    
+  </script></head>
+<body data-integralas-id-dc90d8b2-51c2-aa41-b797-f0887cfcd81a="">
+    <div class="ad-container">
+    <div class="click"></div>
+    <img src="./bg.png" class="bg" style="height: 482px; transform: translate(0px, 63px);">
+    <img src="./cta.png" class="cta" style="transform: translate(0px, 0px);">
+    <img src="./cta-light.png" class="cta-light">
+
+    <img src="./badge.png" class="badge">
+    <img src="./logo.png" class="logo" style="transform: translate(0px, 0px);">
+    <img src="./text1.png" class="text1" style="transform: translate(0px, 0px);">
+    <img src="./text2.png" class="text2" style="transform: translate(0px, 18px); opacity: 1;">
+    <img src="./disc.png" class="disc" style="transform: translate(0px, -45px);">
+
+
+    
+
+
+    <div class="roller">
+        <div class="view slaid slaid1" style="opacity: 0;">
+            <!-- <img src="./img/img1.png" class="elm img1"> -->
+          
+        </div>
+
+        <div class="view slaid slaid2" style="opacity: 1;">
+            
+          
+        </div>
+
+    </div>
+
+    <img src="./circle.png" class="circle circle1  nene" style="opacity: 0.2;">
+    <img src="./circle.png" class="circle circle2  nene" style="opacity: 1;">
+
+    <script type="application/javascript" src="./skeleton.js.pobrane"></script><script id="ias_dw_msnspudjh" type="text/javascript" src="./skeleton(1).js.pobrane"></script><script src="./__IntegralAS_Q_S__"></script>
+  
+    <script src="./roll.js.pobrane"></script>
+    <script src="./main.js.pobrane"></script>
+  
+
+
+    <script>
+        document.querySelectorAll('.click').forEach(item => {
+            item.addEventListener('click', () => window.open(clickTag1))
+        })
+
+    </script>
+
+</div><div style="position: absolute; width: 100%; opacity: 0; height: 100%; z-index: -999; top: 0px; left: 0px;"></div><iframe tabindex="-1" src="./saved_resource(14).html" class="_ntnrjf7826-hj" style="width: 0px !important; height: 0px !important; border: 0px !important; position: absolute !important; top: -10000px !important; left: -10000px !important;"></iframe><img width="1" height="1" src="./B35326601.441376166"></body></html>

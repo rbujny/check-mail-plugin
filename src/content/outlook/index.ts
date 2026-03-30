@@ -3,7 +3,7 @@
  */
 
 import { injectOutlookStandardIcon, injectOutlookRawIcon } from './outlook-injector';
-import { setupMessageListener } from '../toast';
+import { setupMessageListener } from '../shared/toast';
 
 /**
  * Debounce utility.

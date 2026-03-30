@@ -18,7 +18,7 @@
                 "https://mail.google.com/*"
             ],
             "js": [
-                "content.js"
+                "gmail-content.js"
             ],
             "run_at": "document_idle"
         },
@@ -27,7 +27,7 @@
                 "https://mail.google.com/mail/*?*view=om*"
             ],
             "js": [
-                "show-original-content.js"
+                "gmail-show-original-content.js"
             ],
             "run_at": "document_idle"
         },

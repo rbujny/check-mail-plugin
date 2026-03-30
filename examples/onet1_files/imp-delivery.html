@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<!-- saved from url=(0597)https://ams.creativecdn.com/ad/imp-delivery?curl=https%3A%2F%2Fams.creativecdn.com%2Fad%2Fclicks%3F%7BEXTRA_CLICK_PARAMS%7D&tk=mHMYaNxh_Sz_FFcSDeqZelCbAwKgpNqa0Jt0TC5vJeUF6wjnheR3pK5DWMAn7j4K27JJoW_W8krjtxWOpaDUh-2pyGnuRfcxmahne2AT_UgrHbgmIWSxGydOFNKDzHRFb_Fr72LrBFJWCZPP2WSfHQ345KY0KxQOszu8lNeS63so5F7kNmceTxWaqs1G3_FjTFuu8RWpPZ1UE2rBgRlW_5Pn1STfcyQf5ceCVn66BXxQtYTtIVJ8auMLzfAnrkkHhZQmGwrFCInziveum5OQTNoWKakuBGXtFpEH6v447NUinpfp2TxIoO4irs7p_-AeOREH8yxftABqW6Ozad2_eTDXf5OxuiEGUlqFxcgBJQ1X6g1V7eqz90na1GtfZg48dLeyptAvo5aJmbpeKFArCjVh4BQ1LXDoBNC9EmnH4f2lA7lOI4a929x2XIGLDMIgG0XgOfoYMWdv6bURyZWKXQ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>RTB House</title>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" href="data:image/png;base64,AAABAAEAEBACAAEAAQBpAAAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAQAAAAEAgGAAAAH/P/YQAAADBJREFUOI1jfOdgwUAJYKJINwMDAwsDA8P/AXXBwBvAwsDAwDigLhh4A0bTwWBIBwAMNwOO8sF0lgAAAABJRU5ErkJggg==">
+	<link type="text/css" rel="stylesheet" href="./main.css">
+	<link type="text/css" rel="stylesheet" href="./total.css">
+	<link rel="stylesheet" href="./css2">
+	<style>
+		/**/
+		body{font-family:Roboto}
+		/**/
+	</style>
+	<style>
+/*
+*/
+		.offer-button-bg:before{
+			background-image:url('https://statics.creativecdn.com/uT9injmOKhcMGGlSsIz3XQlcFNyOh3F7/7-baner-950x200/images/button.png');
+		}
+/*
+*/
+		.offer-button-bg-hover:before{
+			background-image:url('https://statics.creativecdn.com/uT9injmOKhcMGGlSsIz3XQlcFNyOh3F7/7-baner-950x200/images/button_hover.png');
+		}
+/*
+*/
+		.offer-ribbon-container{
+			top:1px;
+			left:1px;
+		}
+/*
+*/
+
+	.offer-ribbon-container, .offer-enlarger-ribbon-container {
+		background-image: url('https://statics.creativecdn.com/uT9injmOKhcMGGlSsIz3XQlcFNyOh3F7/main/images/ribbon.svg');
+		background-repeat: no-repeat;
+		background-size: contain;
+	}
+	</style>
+	<script src="./jquery.min.js.pobrane"></script>
+	<script src="./jquery.transit.min.js.pobrane"></script>
+	<script>
+		var offersCount=4;
+		var startAfterLoad="false"==="true";
+		var audioEnabled="false"==="true";
+		var touristic=false;
+		var enlargerEnabled=false;
+	</script>
+	<script src="./prices.js.pobrane"></script>
+	<script src="./tools.js.pobrane"></script>
+	<script src="./placetext.js.pobrane"></script>
+	<script src="./common.js.pobrane"></script>
+	<script src="./extra.js.pobrane"></script>
+	<script>
+		var offers = [];
+		var noimg = 'https://statics.creativecdn.com/uT9injmOKhcMGGlSsIz3XQlcFNyOh3F7/main/images/noimage.png';
+		window.addEventListener("load",function(){
+			function begin(){
+				if(!document.hidden) {
+					start();
+				}
+				else{
+					setTimeout(begin,100);
+				}
+			}
+			setTimeout(begin,100);
+		});
+		$(document).ready(function(){setTimeout(showBanner,16)});
+/*
+*/
+		function fadeInElement(el){
+			const t = 500;
+			el.css('opacity', '0').css('display', 'block').css('transition-property', 'opacity').css('transition-duration', ((t - 16) / 1000) + 's');
+			setTimeout(function() {
+				el.css('opacity', '1');
+			}, 16);
+			setTimeout(function() {
+				el.css('transition-property', 'none').css('transition-duration', '0s')
+			},t);
+		}
+		function showBanner(){
+			$('.banner').css('display','block');
+			if(!startAfterLoad){
+				fadeInElement($('body'));
+			}
+			function placeTextInButtons(){
+				var containers = $('.offer-button-wrapper');
+				for (var i=0; i<containers.length; i++){
+					var con = $(containers[i])
+					var txt = $(con.find($('span')));
+					con.css('display','block');
+					txt.css('transition-property','opacity').css('transition-duration','0.2s');
+					tools.placeTextField(
+						{
+							container:con,
+							txt:txt
+						},
+						{
+							changeFontSize:true,
+							minFontSize:5,
+							html:true
+						}
+					);
+				}
+			}
+			placeTextInButtons();
+		}
+/*
+*/
+	</script>
+</head>
+<body id="b950x200" class="b950x200 c7-baner-950x200 horizontal wb jumpingframe ob1 hover-anim" style="opacity: 1; display: block; transition-property: none; transition-duration: 0s;">
+	
+	<a class="optout top left" href="https://optout.rtbhouse.com/?utm_source=optout_icon&amp;oot=yXL8ZS5TrutP9XVemcCgmcgT07O9MqJ21EtxqtjCOHpt9blwO2r6iM3xU5voeM7WN81cOT7m0DT09wEsKVhcm0Zo3WrNklDUguWAqtKgXsI&amp;dsa_show=0&amp;dsa_behalf=Fressnapf+Tiernahrungs+GmbH" target="_blank">
+		<svg class="optout__icon" xmlns="http://www.w3.org/2000/svg" width="52" height="6">
+			<path d="M0 4h8v2H0zm0-4h8v2H0zm14.419 5.85l-1.402-2.239c.692-.111 1.36-.667 1.36-1.675 0-1.06-.744-1.786-1.873-1.786H10v5.7h1V3.722h1l1.256 2.128zm-2.043-3.008H11V1.03h1.376c.564 0 .974.35.974.897 0 .555-.41.915-.974.915zM17.38 5.85V1.03h1.727V.15h-4.453v.88h1.726v4.82zm5.174 0c1.077 0 1.658-.658 1.658-1.546 0-.693-.487-1.3-1.102-1.394.53-.111.991-.598.991-1.308C24.1.8 23.528.15 22.477.15h-2.804v5.7zM22.28 2.5h-1.607V1.03h1.607c.504 0 .795.317.795.735 0 .436-.29.735-.795.735zm.043 2.47h-1.65V3.38h1.65c.564 0 .863.368.863.795 0 .496-.325.795-.863.795zm8.09.876V.145h-.71v2.453H26.37V.145h-.71v5.7h.71V3.23h3.332v2.615zm3.685.103c1.684 0 2.829-1.265 2.829-2.949 0-1.683-1.145-2.948-2.829-2.948-1.693 0-2.83 1.265-2.83 2.948 0 1.684 1.137 2.949 2.83 2.949zm0-.633c-1.282 0-2.094-.991-2.094-2.316 0-1.333.812-2.316 2.094-2.316 1.273 0 2.094.983 2.094 2.316 0 1.325-.82 2.316-2.094 2.316zm6.016.633c1.547 0 2.325-.906 2.325-2.325V.146h-.71v3.47c0 1.042-.564 1.7-1.615 1.7-1.052 0-1.615-.658-1.615-1.7V.145h-.71v3.487c0 1.401.778 2.316 2.325 2.316zm5.243 0c1.538 0 2.103-.846 2.103-1.675 0-2.128-3.376-1.393-3.376-2.675 0-.539.487-.906 1.17-.906.624 0 1.223.213 1.65.683l.427-.521C46.853.35 46.178.06 45.306.06c-1.12 0-1.957.641-1.957 1.581 0 2.034 3.376 1.222 3.376 2.692 0 .436-.325.983-1.342.983a2.41 2.41 0 01-1.795-.812l-.419.538c.47.53 1.197.906 2.188.906zM52 5.846v-.633h-3.026V3.248h2.965v-.633h-2.965V.778H52V.145h-3.735v5.7z"></path>
+		</svg>
+	</a>
+	<img src="./star.svg" style="display:none">
+	<div id="banner-container" class="banner banner-container" style="display: block;">
+		<div id="logo-container" class="logo-container bottom left">
+			<a class="logo-clickholder banner-clickholder" data-offer-id="logo">
+				<div class="logo-container-logos-wraper bottom left">
+					<div id="logo-box-0" class="logo-item logo-item--image logo-box" style="display: inline-block;">
+						<img src="./logo_vertical.png" class="logo-img logo-img--contain logo-img--regular" onload="fadeInElement($(this))" style="opacity: 1; display: block; transition-property: none; transition-duration: 0s;">
+					</div>
+				</div>
+			</a>
+		</div>
+		<div id="alloffers-container" class="alloffers-container top right">
+			<div id="alloffers-container-relative" class="alloffers-container-relative" style="width: 1015px; top: 0px;">
+				<a class="banner-clickholder" data-offer-id=""></a>
+
+                        
+
+				<a id="offer0" class="offer offer-container offer--0 no-name-set price-set no-oldprice-set" data-id="0" data-offer-id="2492781" style="width: 185.5px; height: 194px; left: 2px; top: 2px; z-index: 0;">
+					<div class="offer-bg background-container"></div>
+					<div class="offer-shadow shadow-container"></div>
+					<div class="offer-img-container">
+						<div id="img0" class="offer-img offer-img--0" style="background-image:url(&#39;https://ams.creativecdn.com/ad/images?id=d272ec231aa127b488af6c8aa630bfa833125666&amp;w=152&amp;h=200&amp;o=2492781&amp;fid=MkdPgxd3GkmOneeDtNyf&amp;f=3&#39;)"></div>
+					</div>
+					<div id="offer-stars" class="offer-stars offer-stars-position">
+						<div class="stars-inside" style="padding:4px 4px 0 2px">
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+    <div class="offer-custom-ribbon">
+        <span>TYLKO U NAS</span>
+    </div>
+
+
+
+
+					<div class="offer-price-container prices-container  has-base-price " style="margin-bottom:1px">
+						<p class="text-table">
+							<span class="text-table-cell">
+								<span class="offer-price-value">71,94 zł</span>
+							</span>
+								<span class="text-table-cell">
+									<span class="offer-base-price-value">(14,99zł/kg)</span>
+								</span>
+						</p>
+					</div>
+					<div class="offer-border border-container"></div>
+					<script>
+/*
+*/
+						[
+							{
+								selector:".offer--0 .offer-price-value",
+								text:formatPrice("1 110,00 zł",Number(71.94)) || ""
+							}
+/*
+*/
+						].forEach(function(obj){
+							const {selector,text}=obj;
+							if(typeof text==="string" && text!==""){
+								const nodes=document.querySelectorAll(selector);
+								if(nodes && nodes.length>0){
+									[].slice.call(nodes).forEach(function(node){
+										node.innerHTML=text;
+									});
+								}
+							}
+						});
+/*
+*/
+						offers.push({
+							id:"2492781",
+							name:"PREMIERE Best Meat mokra karma dla psa, Adult Wo\u0142owina z kurczakiem i ry\u017Cem 6x800 g",
+							price:/**/"",
+							oldPrice:/**/"",
+ cpRibbon: 'TYLKO U NAS',  base_price: '(14,99z\u0142\/kg)', 							offerCurrency:"",
+							thumbs:/**/[{"width":608,"url":"https:\/\/ams.creativecdn.com\/ad\/images?id=d272ec231aa127b488af6c8aa630bfa833125666&w=608&h=800&o=2492781&fid=MkdPgxd3GkmOneeDtNyf&f=3","height":800},{"width":304,"url":"https:\/\/ams.creativecdn.com\/ad\/images?id=d272ec231aa127b488af6c8aa630bfa833125666&w=304&h=400&o=2492781&fid=MkdPgxd3GkmOneeDtNyf&f=3","height":400},{"width":152,"url":"https:\/\/ams.creativecdn.com\/ad\/images?id=d272ec231aa127b488af6c8aa630bfa833125666&w=152&h=200&o=2492781&fid=MkdPgxd3GkmOneeDtNyf&f=3","height":200}] || /**/[{"url":"https://ams.creativecdn.com/ad/images?id=d272ec231aa127b488af6c8aa630bfa833125666&w=152&h=200&o=2492781&fid=MkdPgxd3GkmOneeDtNyf&f=3"}],
+/*
+*/
+							fullName:"PREMIERE Best Meat mokra karma dla psa, Adult Wo\u0142owina z kurczakiem i ry\u017Cem 6x800 g",
+/*
+*/
+							stars:5.0,
+/*
+*/
+							ribbonText:/**/""
+						});
+					</script>
+					
+				</a>
+
+                        
+
+				<a id="offer1" class="offer offer-container offer--1 no-name-set price-set no-oldprice-set" data-id="1" data-offer-id="1382262" style="width: 185.5px; height: 194px; left: 188.5px; top: 2px; z-index: 1;">
+					<div class="offer-bg background-container"></div>
+					<div class="offer-shadow shadow-container"></div>
+					<div class="offer-img-container">
+						<div id="img1" class="offer-img offer-img--1" style="background-image:url(&#39;https://ams.creativecdn.com/ad/images?id=e371750f33169d6cc4d5cf8d3a802f9487c93ef5&amp;w=178&amp;h=169&amp;o=1382262&amp;fid=MkdPgxd3GkmOneeDtNyf&amp;f=3&#39;)"></div>
+					</div>
+					<div id="offer-stars" class="offer-stars offer-stars-position">
+						<div class="stars-inside" style="padding:4px 4px 0 2px">
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+
+
+
+
+					<div class="offer-price-container prices-container  has-base-price " style="margin-bottom:1px">
+						<p class="text-table">
+							<span class="text-table-cell">
+								<span class="offer-price-value">48,30 zł</span>
+							</span>
+								<span class="text-table-cell">
+									<span class="offer-base-price-value">(20,13zł/kg)</span>
+								</span>
+						</p>
+					</div>
+					<div class="offer-border border-container"></div>
+					<script>
+/*
+*/
+						[
+							{
+								selector:".offer--1 .offer-price-value",
+								text:formatPrice("1 110,00 zł",Number(48.3)) || ""
+							}
+/*
+*/
+						].forEach(function(obj){
+							const {selector,text}=obj;
+							if(typeof text==="string" && text!==""){
+								const nodes=document.querySelectorAll(selector);
+								if(nodes && nodes.length>0){
+									[].slice.call(nodes).forEach(function(node){
+										node.innerHTML=text;
+									});
+								}
+							}
+						});
+/*
+*/
+						offers.push({
+							id:"1382262",
+							name:"MAC\'s DOG G\u0142owizna i marchew 6x400 g",
+							price:/**/"",
+							oldPrice:/**/"",
+ base_price: '(20,13z\u0142\/kg)', 							offerCurrency:"",
+							thumbs:/**/[{"width":713,"url":"https:\/\/ams.creativecdn.com\/ad\/images?id=e371750f33169d6cc4d5cf8d3a802f9487c93ef5&w=713&h=677&o=1382262&fid=MkdPgxd3GkmOneeDtNyf&f=3","height":677},{"width":356,"url":"https:\/\/ams.creativecdn.com\/ad\/images?id=e371750f33169d6cc4d5cf8d3a802f9487c93ef5&w=356&h=338&o=1382262&fid=MkdPgxd3GkmOneeDtNyf&f=3","height":338},{"width":178,"url":"https:\/\/ams.creativecdn.com\/ad\/images?id=e371750f33169d6cc4d5cf8d3a802f9487c93ef5&w=178&h=169&o=1382262&fid=MkdPgxd3GkmOneeDtNyf&f=3","height":169}] || /**/[{"url":"https://ams.creativecdn.com/ad/images?id=e371750f33169d6cc4d5cf8d3a802f9487c93ef5&w=178&h=169&o=1382262&fid=MkdPgxd3GkmOneeDtNyf&f=3"}],
+/*
+*/
+							fullName:"MAC\'s DOG G\u0142owizna i marchew 6x400 g",
+/*
+*/
+							stars:5.0,
+/*
+*/
+							ribbonText:/**/""
+						});
+					</script>
+					
+				</a>
+
+                        
+
+				<a id="offer2" class="offer offer-container offer--2 no-name-set price-set no-oldprice-set" data-id="2" data-offer-id="1236218" style="width: 185.5px; height: 194px; left: 375px; top: 2px; z-index: 2;">
+					<div class="offer-bg background-container"></div>
+					<div class="offer-shadow shadow-container"></div>
+					<div class="offer-img-container">
+						<div id="img2" class="offer-img offer-img--2" style="background-image:url(&#39;https://ams.creativecdn.com/ad/images?id=5b45b13f235db0d4469c98b9a31a33125f1ed8db&amp;w=120&amp;h=200&amp;o=1236218&amp;fid=MkdPgxd3GkmOneeDtNyf&amp;f=3&#39;)"></div>
+					</div>
+					<div id="offer-stars" class="offer-stars offer-stars-position">
+						<div class="stars-inside" style="padding:4px 4px 0 2px">
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+
+
+
+
+					<div class="offer-price-container prices-container  has-base-price " style="margin-bottom:1px">
+						<p class="text-table">
+							<span class="text-table-cell">
+								<span class="offer-price-value">299,89 zł</span>
+							</span>
+								<span class="text-table-cell">
+									<span class="offer-base-price-value">(26,31zł/kg)</span>
+								</span>
+						</p>
+					</div>
+					<div class="offer-border border-container"></div>
+					<script>
+/*
+*/
+						[
+							{
+								selector:".offer--2 .offer-price-value",
+								text:formatPrice("1 110,00 zł",Number(299.89)) || ""
+							}
+/*
+*/
+						].forEach(function(obj){
+							const {selector,text}=obj;
+							if(typeof text==="string" && text!==""){
+								const nodes=document.querySelectorAll(selector);
+								if(nodes && nodes.length>0){
+									[].slice.call(nodes).forEach(function(node){
+										node.innerHTML=text;
+									});
+								}
+							}
+						});
+/*
+*/
+						offers.push({
+							id:"1236218",
+							name:"ACANA Puppy Large Breed 11,4 kg 11,4 kg",
+							price:/**/"",
+							oldPrice:/**/"",
+ base_price: '(26,31z\u0142\/kg)', 							offerCurrency:"",
+							thumbs:/**/[{"width":481,"url":"https:\/\/ams.creativecdn.com\/ad\/images?id=5b45b13f235db0d4469c98b9a31a33125f1ed8db&w=481&h=800&o=1236218&fid=MkdPgxd3GkmOneeDtNyf&f=3","height":800},{"width":240,"url":"https:\/\/ams.creativecdn.com\/ad\/images?id=5b45b13f235db0d4469c98b9a31a33125f1ed8db&w=240&h=400&o=1236218&fid=MkdPgxd3GkmOneeDtNyf&f=3","height":400},{"width":120,"url":"https:\/\/ams.creativecdn.com\/ad\/images?id=5b45b13f235db0d4469c98b9a31a33125f1ed8db&w=120&h=200&o=1236218&fid=MkdPgxd3GkmOneeDtNyf&f=3","height":200}] || /**/[{"url":"https://ams.creativecdn.com/ad/images?id=5b45b13f235db0d4469c98b9a31a33125f1ed8db&w=120&h=200&o=1236218&fid=MkdPgxd3GkmOneeDtNyf&f=3"}],
+/*
+*/
+							fullName:"ACANA Puppy Large Breed 11,4 kg 11,4 kg",
+/*
+*/
+							stars:5.0,
+/*
+*/
+							ribbonText:/**/""
+						});
+					</script>
+					
+				</a>
+
+                        
+
+				<a id="offer3" class="offer offer-container offer--3 no-name-set price-set no-oldprice-set" data-id="3" data-offer-id="1382258" style="width: 185.5px; height: 194px; left: 561.5px; top: 2px; z-index: 100;">
+					<div class="offer-bg background-container"></div>
+					<div class="offer-shadow shadow-container"></div>
+					<div class="offer-img-container">
+						<div id="img3" class="offer-img offer-img--3" style="background-image:url(&#39;https://ams.creativecdn.com/ad/images?id=6b639594967ae6d02b32ba59c436f63adfd20c7b&amp;w=178&amp;h=169&amp;o=1382258&amp;fid=MkdPgxd3GkmOneeDtNyf&amp;f=3&#39;)"></div>
+					</div>
+					<div id="offer-stars" class="offer-stars offer-stars-position">
+						<div class="stars-inside" style="padding:4px 4px 0 2px">
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+							<div style="width:11px;left:0;top:0;padding:0;margin:0;display:inline-block">
+								<div>
+									<img src="./star.svg" width="11" height="11">
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+
+
+
+
+					<div class="offer-price-container prices-container  has-base-price " style="margin-bottom:1px">
+						<p class="text-table">
+							<span class="text-table-cell">
+								<span class="offer-price-value">48,30 zł</span>
+							</span>
+								<span class="text-table-cell">
+									<span class="offer-base-price-value">(20,13zł/kg)</span>
+								</span>
+						</p>
+					</div>
+					<div class="offer-border border-container offer-jumping-frame"></div>
+					<script>
+/*
+*/
+						[
+							{
+								selector:".offer--3 .offer-price-value",
+								text:formatPrice("1 110,00 zł",Number(48.3)) || ""
+							}
+/*
+*/
+						].forEach(function(obj){
+							const {selector,text}=obj;
+							if(typeof text==="string" && text!==""){
+								const nodes=document.querySelectorAll(selector);
+								if(nodes && nodes.length>0){
+									[].slice.call(nodes).forEach(function(node){
+										node.innerHTML=text;
+									});
+								}
+							}
+						});
+/*
+*/
+						offers.push({
+							id:"1382258",
+							name:"MAC\'s DOG Wo\u0142owina i dynia 6x400 g",
+							price:/**/"",
+							oldPrice:/**/"",
+ base_price: '(20,13z\u0142\/kg)', 							offerCurrency:"",
+							thumbs:/**/[{"width":713,"url":"https:\/\/ams.creativecdn.com\/ad\/images?id=6b639594967ae6d02b32ba59c436f63adfd20c7b&w=713&h=677&o=1382258&fid=MkdPgxd3GkmOneeDtNyf&f=3","height":677},{"width":356,"url":"https:\/\/ams.creativecdn.com\/ad\/images?id=6b639594967ae6d02b32ba59c436f63adfd20c7b&w=356&h=338&o=1382258&fid=MkdPgxd3GkmOneeDtNyf&f=3","height":338},{"width":178,"url":"https:\/\/ams.creativecdn.com\/ad\/images?id=6b639594967ae6d02b32ba59c436f63adfd20c7b&w=178&h=169&o=1382258&fid=MkdPgxd3GkmOneeDtNyf&f=3","height":169}] || /**/[{"url":"https://ams.creativecdn.com/ad/images?id=6b639594967ae6d02b32ba59c436f63adfd20c7b&w=178&h=169&o=1382258&fid=MkdPgxd3GkmOneeDtNyf&f=3"}],
+/*
+*/
+							fullName:"MAC\'s DOG Wo\u0142owina i dynia 6x400 g",
+/*
+*/
+							stars:5.0,
+/*
+*/
+							ribbonText:/**/""
+						});
+					</script>
+					
+				</a>
+			</div>
+		</div>
+	</div>
+	<script>
+		var bannerWidth=950;
+		var bannerHeight=200;
+		function start(){
+			banner.init({
+				offersCount:4,
+				screenOffers:'4',
+				infiniteAnimAllowed:true,
+				offerPriceEnabled:true,
+				logoAnimFadeSpeed:parseInt(500),
+				logoAnimInterval:parseInt(3000),
+				enlargerAnimEnabled:false,
+				containerHeight:195,
+				sliderScreenWidth:746+15,
+				screensMargin:15,
+				enlargerType:(false || true) ? '' : "ANIMINFO",
+				animAgain:"false",
+				arrowsEnabled:"false",
+				logoGIFanimation:"false",
+/*
+*/
+				creativeBannerTrmplateAnimationType:"SPECIALANIMINFO"
+			});
+/*
+*/
+			startAfterLoad && fadeInElement($('body'));
+/*
+*/
+			this.extraInit && this.extraInit();
+		}
+	</script>
+	<div style="position:absolute;width:0;height:0;opacity:0;overflow:hidden">
+		<script src="./t2zns4s97xhycbba5fdg.js.pobrane" data-imp-tag-url-vbl-non-measurable="https://ams.creativecdn.com/ad/imp-tags?tk=Cvb0gxwPf4QH1mtFBSyyS0eYYuIAV_ieEeItC4zMrAdQTjoNYn906kD2WYKC1DG9et7l66Fg6_epckDL_0hLN0cQ_E4txPTMsBs5aB0wHS4nsCE3qyzgC9PjWx70b2-h08ZBUtFT7VNfwXgz7j2nBoi6YimP3ywEai3xa_FSOJri0VY3_LAwlAMt7MJRH6DwlNx-TYd0KiSu6wN8ffOEkhTwuE-3i2-iq3fcgHJngGYTF4Hd3q1860rPri5btuHecs51VPLf9oKzLNZsGbgWxQOfGSXJZmGAV0_Ds0fK0uNpLS1E-4s9zsRVQKTXLdYWpcuDmp3dBRLrU-ggi_ysfAA5kwCTBqsqTcRi8nDbe8uRKxrRtNa-Ryvzp2SzO1Dk1LSoaCUwL5WZIIWYTFl2Y94TUeMMcYGfR5AJ5nWjfJDNG2J5XyaTpco9V-ueAOHvmoznHPh9K5ufztwRrETzgCYwdxqw2zIEHXLEoNhoGlKpvms1rykmlzb496G4ZksZRSdoLlrvyTasrlh8fyDdJNHn18x77RLHsLVoMcOVfKmvl0jmkK1ilWn5DlFvzkkViASeZAydpPsgxGUpY3Hqsw" data-imp-tag-url-vbl-measurable="https://ams.creativecdn.com/ad/imp-tags?tk=QYdSJMPEYB6pceF3nAP-usI2Hk8eswT2gA-wmxW7wep4Arh2fiLFYsJRUIKlNFniPXE0OhWGWNfgAbrDEzupNcPLX5vNy7hi2My9EpHxVAOXzAyglKw94KIiurreF0Q9QogFzgt30RRneYMYakui4OLq9B2C6781XMDgSRYpgwPXLb31zDgpLdZDFeIcQ3fnP35zkdsseoOopFTDJW-gMizR4uvcHgEuokCcUCrxSStjkPkQWN7bFCVePvz0ufiRLhX51YQZ6heUGb2mS7swnBsqJgch9lRDI5fdeSPKOYYXnFCOD4rxMiYjuyTMIAtHwmKojks6HLOexoEV1n0OvLKDo4-HWfizOA_Mt51ybaIyDOv7NeUERqjPhPRAjPS3MbtNlIB-V13MAJSEV5uyjniWz1kvXAghcjdgcX6_gkVgWrLUD0i3MUslXx7AhYQenfCFJUkoCMnYwoBm2CbjF0B9VFgUsJplnlyyco8Uwn-8dpJdDlRxdmZGb_LMJaWjB3biTY5hyUH7VmoEinP1QXCFl8EQS5tzT2s9vCBpJ2VwM2XbihlWD76MFfxITx3nFXJL2jpeEzSyvxU2fyPI6A" data-imp-tag-url-vbl-viewable="https://ams.creativecdn.com/ad/imp-tags?tk=qMJpdYGHLPs9f_6ujY9Al1xCPRDIEgCa_i_DogtkNDcCEBtJ7szY-Oois4HYjd_H6-a6KLVAkbSxb-73lhIUawh1B33at3vVEfXwXGdsggpNOvdbWtQEMXTy-QtIuiN5eJ6LXwJmkhVL3v0wZFhPvsXas8eKr7lEHEzmfMeEwyBijHTYA7kwLJFxc_O9QFtfyG58-R3EP0YnlBuPqUNDiFKELG24G7BkUW35j6hdPn1Vsm6yFmbRyfdnNRiiTSMK6eyGN3c0cFo9XXOznW2GErimhQkFPCdfFkFeYV2ZRT0Vcs6ulxhia--6svll9lzv-7aE0TvAigsoCu_747XH0rG44rrREXc43zPZX1yu4b8dc1r3II98iBvNmHPowcpX2PoTOVPG20Y1d2LJFV_KqgxkaDUOoP0k_JG3Jc7CeaJb_Hn_GwngWUrbo1er7YMb0HCLPfRoKVIH6LlruS2gij2Mlwd9F_-Fk4zSObvlQ30MrWXs5GpsnbUVNVKoS4PnQgvN9BPp9eO6HDxEgBkbdhtaGEVQi_rFfMoqHcEzFpaG6Z4HphLAl3iIwDhMc14d-8lzO8swhVArVN0BbFN7Bg"></script>
+
+	</div>
+	
+<script>
+/*
+*/
+(function(){
+
+	const offers={
+/*
+*/
+		"2492781":["https://ams.creativecdn.com/ad/clicks?tk=fllQQ7rPQ5dEWTLKU1ip2JFgAlto9zVC0hkipHE7q2C8JUcSwtWzXDDoTymYDOgcWgVBeAR8F4-SBaAxNHxm172RnEWuhl8YUSaMnyMHV1c99fsGGjpCHuUtDsIZr3fNihfQEDEgQtkXGfMJihGIW7yqVUFaJSrFUBiRhDImIPsCj3JFqovvFbwVZSgBB5ElAVV9DSK95zPDWthof4vYulUyNl0hqaPOiZRSr6sMEDrJt5aA-EEaGknKbiFl7VTdom_bR8anIaNUcNjjOoOrzJi3S-jHVHCNaGm4GhweMHr9kGERYtqxQZb4GkEfOBqSR7VbHQQMiaGLKlhcGqIsrsNR-SSVs6G-bxjNswqd3xle8CxjV3gZIOVTFIsdJ2hXQTG-IqgoFjhfnrn7QKA6xrdy9c6rAV110iwmH6sSWIkC4nQMsd6KK5kxN_bx_pGzWfjyxkQ4gRmWkd8vrK8BaUajPfgKj51W49LmXxkVAQ8ZlLWVe55HTJ44ap75iqRUObWexjGOJcin8rkRKykJbLVGgwn6CO39g8kLAkkMsodrdW5vtqutJ8_Z3TRj5C2QiSf9YJ_yhHwivH_wqwEf8Q"],
+/*
+*/
+		"1382262":["https://ams.creativecdn.com/ad/clicks?tk=fllQQ7rPQ5dEWTLKU1ip2JFgAlto9zVC0hkipHE7q2C8JUcSwtWzXDDoTymYDOgcWgVBeAR8F4-SBaAxNHxm172RnEWuhl8YUSaMnyMHV1c99fsGGjpCHuUtDsIZr3fNihfQEDEgQtkXGfMJihGIW7yqVUFaJSrFUBiRhDImIPsCj3JFqovvFbwVZSgBB5ElAVV9DSK95zPDWthof4vYulUyNl0hqaPOiZRSr6sMEDrJt5aA-EEaGknKbiFl7VTdom_bR8anIaNUcNjjOoOrzJi3S-jHVHCNaGm4GhweMHr9kGERYtqxQZb4GkEfOBqSR7VbHQQMiaGLKlhcGqIsrsNR-SSVs6G-bxjNswqd3xle8CxjV3gZIOVTFIsdJ2hXQTG-IqgoFjhfnrn7QKA6xrdy9c6rAV110iwmH6sSWIkC4nQMsd6KK5kxN_bx_pGzWfjyxkQ4gRmWkd8vrK8BaUajPfgKj51W49LmXxkVAQ8ZlLWVe55HTJ44ap75iqRUObWexjGOJcin8rkRKykJbLVGgwn6CO39g8kLAkkMsodrdW5vtqutJ8_Z3TRj5C2Qgx7Dbx2uAaflY5R0eosFTw"],
+/*
+*/
+		"1236218":["https://ams.creativecdn.com/ad/clicks?tk=fllQQ7rPQ5dEWTLKU1ip2JFgAlto9zVC0hkipHE7q2C8JUcSwtWzXDDoTymYDOgcWgVBeAR8F4-SBaAxNHxm172RnEWuhl8YUSaMnyMHV1c99fsGGjpCHuUtDsIZr3fNihfQEDEgQtkXGfMJihGIW7yqVUFaJSrFUBiRhDImIPsCj3JFqovvFbwVZSgBB5ElAVV9DSK95zPDWthof4vYulUyNl0hqaPOiZRSr6sMEDrJt5aA-EEaGknKbiFl7VTdom_bR8anIaNUcNjjOoOrzJi3S-jHVHCNaGm4GhweMHr9kGERYtqxQZb4GkEfOBqSR7VbHQQMiaGLKlhcGqIsrsNR-SSVs6G-bxjNswqd3xle8CxjV3gZIOVTFIsdJ2hXQTG-IqgoFjhfnrn7QKA6xrdy9c6rAV110iwmH6sSWIkC4nQMsd6KK5kxN_bx_pGzWfjyxkQ4gRmWkd8vrK8BaUajPfgKj51W49LmXxkVAQ8ZlLWVe55HTJ44ap75iqRUObWexjGOJcin8rkRKykJbLVGgwn6CO39g8kLAkkMsodrdW5vtqutJ8_Z3TRj5C2QDZk6U7qSCpe2nYkTz9no4A"],
+/*
+*/
+		"1382258":["https://ams.creativecdn.com/ad/clicks?tk=fllQQ7rPQ5dEWTLKU1ip2JFgAlto9zVC0hkipHE7q2C8JUcSwtWzXDDoTymYDOgcWgVBeAR8F4-SBaAxNHxm172RnEWuhl8YUSaMnyMHV1c99fsGGjpCHuUtDsIZr3fNihfQEDEgQtkXGfMJihGIW7yqVUFaJSrFUBiRhDImIPsCj3JFqovvFbwVZSgBB5ElAVV9DSK95zPDWthof4vYulUyNl0hqaPOiZRSr6sMEDrJt5aA-EEaGknKbiFl7VTdom_bR8anIaNUcNjjOoOrzJi3S-jHVHCNaGm4GhweMHr9kGERYtqxQZb4GkEfOBqSR7VbHQQMiaGLKlhcGqIsrsNR-SSVs6G-bxjNswqd3xle8CxjV3gZIOVTFIsdJ2hXQTG-IqgoFjhfnrn7QKA6xrdy9c6rAV110iwmH6sSWIkC4nQMsd6KK5kxN_bx_pGzWfjyxkQ4gRmWkd8vrK8BaUajPfgKj51W49LmXxkVAQ8ZlLWVe55HTJ44ap75iqRUObWexjGOJcin8rkRKykJbLVGgwn6CO39g8kLAkkMsodrdW5vtqutJ8_Z3TRj5C2QIhEcCFfrVvDh7ynYTLOQ9g"],
+/*
+*/
+		"rtb_default_url_7xV6RqbhjWertXFse05l":["https://ams.creativecdn.com/ad/clicks?tk=1qBrsVjs72GigSTZ6cVOU4yHPqfvgfCSNXOmRAQiwzkWRg-V1Adq_62vHYYxKFUtPsNnod5qsSz9nVyJmNUWDUApY0JqAoQlSdyxjfyY8pK-OZ-YQJIhLmb75CZ1JUTnOLzPaYJNJHjtR6SOCZulwHRlmu409MfuFTMMHSTyaiYtEI_i21W5V_6g-RUHBGuOMD0GDc-kBFQUVshJ_YHTk2J9m5HEZY_ZleKLrUFX8RMcxWUIZXe9oy7vWhao3oMQhKnBR7AjKU6CSXWDb7KfU6-7CpgACqQzxmIBYvWlgjQtWqJUA5J5LEyFbfXK-OB_XPpnkGdTgArd8VZWGLEUXHXifyuriHX5QKk0ByapcW_EONWw5yH6JKt_WHRF2FsyR4MYeERQppI4WR8OfYo3brUBn0rP9hVEomjy-JI8JWQEB9_QRsgeBPlSqjAY1mkhsJqCmQhSkq3kqYdnEuo0r8o94sPEM_Kfe2mJyOlf6xbhmeEkZoeppp1-ErLGmMwOxvDd_o1pakVTW2xhXPE_cltAaT7THrucNXhshPgLo19kQCXqhdjPrDi5PIEa9bmVF2PwXjhusq0FUtxtfS3Ybdn3wGUyafxz_K-SDVTEHmQ"],
+/*
+*/
+		"Maxi_Deals_Counter_PL":["https://ams.creativecdn.com/ad/clicks?tk=CRLqcD8WQTe9e-ZRg6Sybl2Ark-Fupee7mZ-WXz-V0Sh2Pcii4TW5oXSD7pHlh1tLY36XNQxoIprLcGdOAz9-OVHRBgBK-FXAtcVbIe4cWYwynNTLC5MjJ6O0oKistlnNMPHTBtVtMVoiGW28WOFhqrAmTIm8i3jO2wMrCfjp19vy0F0lBMAo6VvtM3GzqDOGbBFpQIT7O5O4uMU3bgDpPfRltsn58Dl8csp2WrL5-rizDwc3d7TdjWa1ttPmEROR7jBGTMXKsb43F_Ex_PFX3VpGSxvjF1byNwh44kq-y3HL4Q2K9irQw8_e96xFNzpSeU44bKW1RVGWPa1u0TAih5KB0AC_FzH9RgWiPmF1ldJCnpe2sZfuZr9A0WjG-SZB1Vtu0nUWDFJ3guJMvu76-faGT5O-xnAa5H-FN3rEX9MphZaZmo4s2YSDc-MPekXtkY00szsQRzXEb-J5JBFigq5sJ9uU7ugcdL53IPXgIob__398OCNSbv4E4VmYY3Hd_C2fSgyH5i55K18IxUo7_4OmNjMnTIz-Sw2CezZ5-4xL173Hd51JCZwOMnsd8N8TsA-MSyNmtmTPDB79r7ckl3OlEv2Gd3ARi5vqYM2ku8"],
+/*
+*/
+		"*":undefined
+	};
+
+	const send=(
+		window.fetch
+		? function(url){
+			fetch(url,{keepalive:true,mode:"no-cors"});
+		}
+		: function(url){
+			new window.Image().src=url;
+		}
+	);
+
+	function getId(node){
+		var spec;
+		if(node && node.dataset){
+			const id=node.dataset.offerId;
+			if(id===undefined){
+				return getId(node.parentNode);
+			}
+			if(id!==""){
+				if(/^\w+$/.test(id)){
+					spec="rtb_"+id+"_7xV6RqbhjWertXFse05l_Yvd0g0MvwepGChDEZsAA";
+					if(!offers[spec]){
+						spec="rtb_"+id+"_7xV6RqbhjWertXFse05l_696tboao9ae07x78tv2pyo07zxi2ba82";
+						if(!offers[spec]){
+							spec="rtb_"+id+"_7xV6RqbhjWertXFse05l";
+							if(!offers[spec]){
+								spec=id+"_7xV6RqbhjWertXFse05l_Yvd0g0MvwepGChDEZsAA";
+								if(!offers[spec]){
+									spec=id+"_7xV6RqbhjWertXFse05l_696tboao9ae07x78tv2pyo07zxi2ba82";
+									if(!offers[spec]){
+										spec=id+"_7xV6RqbhjWertXFse05l";
+									}
+								}
+							}
+						}
+					}
+					if(offers[spec]){
+						return spec;
+					}
+				}
+				if(offers[id]){
+					return id;
+				}
+			}
+			return "rtb_default_url_7xV6RqbhjWertXFse05l";
+		}
+	}
+
+	function handleClick(e){
+		if(e.defaultPrevented){
+			return;
+		}
+		const id=getId(e.target);
+		const data=offers[id];
+		if(!data){
+			return;
+		}
+		window.open(data[0]);
+/*
+*/
+	}
+
+	const root=document.body || window;
+	root.addEventListener("click",handleClick);
+	if(root.onauxclick!==undefined){
+		root.addEventListener("auxclick",function(e){
+			if(e.button===1){
+				handleClick(e);
+			}
+		});
+	}
+	else{
+		(function(){
+			var middle;
+			root.addEventListener("mousedown",function(e){
+				middle=e.button===1;
+			});
+			root.addEventListener("mouseup",function(e){
+				if(e.button===1 && middle){
+					handleClick(e);
+				}
+				middle=undefined;
+			});
+		}());
+	}
+
+	if(window.ReportingObserver){
+		new window.ReportingObserver(
+			function(reports){
+				reports.forEach(function(report){
+					if(report.type!=="deprecation"){
+						const message=report.body && report.body.message;
+						if(message){
+							send(
+								"https://adtracker.toolscdn.com/v1/reports/tracks/create?IH=9jZmLnA10eBnokQx57w2&AH=MkdPgxd3GkmOneeDtNyf&SH=7xV6RqbhjWertXFse05l&CH=Yvd0g0MvwepGChDEZsAA&BT=REPORT&ERR="
+								+window.encodeURIComponent(
+									message
+									.replace(/ See https\S+$/,"")
+									.slice(0,300)
+								)
+								+"&T="
+								+window.Date.now()
+							);
+						}
+					}
+				});
+			},
+			{buffered:true}
+		).observe();
+	}
+
+}());
+</script>
+
+</body></html>
