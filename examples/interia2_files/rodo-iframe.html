@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<!-- saved from url=(0080)https://prywatnosc.interia.pl/rodo-iframe#origin=https%3A%2F%2Fpoczta.interia.pl -->
+<html lang="pl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title></title></head><body>
+    <script>
+        /**
+         * Funkcja do logowania bledow na naszych serwerach.
+         */
+        var toLogs = function (str, data) {
+            try {
+                fetch('//l.iplsc.com/logger/', {
+                    method: 'POST',
+                    headers: {
+                        "Content-type": "text/plain"
+                    },
+                    body: JSON.stringify({
+                        level: 'error',
+                        line: 0,
+                        origin: 'iplv3',
+                        referer: location.href,
+                        method: 'console_log',
+                        message: 'rdebug4 iframe ' + str,
+                        data: data
+                    })
+                });
+            } catch (e) {}
+        };
+        /**
+         * Odczytanie globalnych ustawien rodo
+         * @return {{v: string, d: number, iab: string, tcf: string}}
+         */
+        var read = function () {
+            var data = null;
+
+            try {
+                data = localStorage.getItem('rodo');
+                if (!data) {
+                    return null;
+                }
+                data = JSON.parse(data);
+                // jezeli data jest starsza niz rok temu
+                if ((new Date()).getTime() - data.d > 3600000*24*365) {
+                    data = null;
+                }
+            } catch (e) {
+                window.console && console.log('Iframe: Problem z odczytem', e);
+                data = null;
+            }
+            return data;
+        };
+        /**
+         * Zapisanie globalnych ustawien rodo
+         * @param {{v: string, d: number, iab: string, tcf: string}} value - zgoda z czasem
+         */
+        var write = function (value) {
+            try {
+                if (value.v) {
+                    localStorage.setItem('rodo', JSON.stringify(value));
+                } else {
+                    window.console && console.log('Iframe: niepoprawny format danych do zapisania', value);
+                }
+            } catch (e) {
+                window.console && console.log('Iframe: Problem z zapisem', e, value);
+                return null;
+            }
+        };
+
+        // jesli jest hash to pobieramy z hash a jak nie to po staremu
+        var originUrl = decodeURIComponent(location.hash ? location.hash.split('origin=')[1] : location.search.split('origin=')[1]),
+            host = originUrl.replace(/https?\:\/\//, ''),
+            // format komunikatu wysylanego do inpl.rd, dzieki temu odsiejemy spam
+            agreement = {
+                command: 'get-rodo-data',
+                data: read()
+            };
+
+        // wysylam do origina przeczytane dane. Zabezpieczam przed wyslaniem do siebie
+        if (top !== window) {
+            //jesli promocyjni to wysylam do parenta
+            var targetWindow = /polska-press.gazetkapromocyjna.pl/i.test(originUrl) ? window.parent : top;
+
+            window.console && console.log('Iframe: wysyłam ', agreement, 'do', originUrl);
+            // wysylam zawsze w nowym formacie bo po konwersji
+            targetWindow.postMessage(JSON.stringify(agreement), originUrl);
+        }
+
+        // nasluchujemy zeby zapisac globalne dane
+        window.addEventListener("message", function (ev) {
+            try {
+                /**
+                 * @type {{command: 'save-rodo-data', data: {v:string, d:number, iab: string, tcf: string}} obj
+                 */
+                var obj =  JSON.parse(ev.data);
+
+                // nowy format komunikatow
+                if (obj.command === 'save-rodo-data' && obj.data) {
+                    write(obj.data);
+                }
+            } catch (e) {
+                window.console && console.log('Iframe: błąd onMessage: ',e , ev.data);
+            }
+        }, false);
+    </script>
+</body></html>

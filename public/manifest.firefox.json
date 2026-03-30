@@ -6,6 +6,9 @@
     "permissions": [],
     "host_permissions": [
         "https://mail.google.com/*",
+        "https://outlook.live.com/*",
+        "https://outlook.office.com/*",
+        "https://outlook.office365.com/*",
         "http://localhost:8080/*",
         "http://127.0.0.1:8080/*"
     ],
@@ -15,7 +18,7 @@
                 "https://mail.google.com/*"
             ],
             "js": [
-                "content.js"
+                "gmail-content.js"
             ],
             "run_at": "document_idle"
         },
@@ -24,7 +27,18 @@
                 "https://mail.google.com/mail/*?*view=om*"
             ],
             "js": [
-                "show-original-content.js"
+                "gmail-show-original-content.js"
+            ],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "https://outlook.live.com/*",
+                "https://outlook.office.com/*",
+                "https://outlook.office365.com/*"
+            ],
+            "js": [
+                "outlook-content.js"
             ],
             "run_at": "document_idle"
         }

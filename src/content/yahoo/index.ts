@@ -10,7 +10,7 @@
  */
 
 import { injectYahooStandardIcon, injectYahooRawIcon } from './yahoo-injector';
-import { setupMessageListener } from '../toast';
+import { setupMessageListener } from '../shared/toast';
 
 /**
  * Debounce utility to prevent excessive DOM processing during

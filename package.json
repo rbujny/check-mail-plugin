@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && esbuild src/content/index.ts --bundle --outfile=dist/content.js --format=iife && esbuild src/content/show-original-index.ts --bundle --outfile=dist/show-original-content.js --format=iife && esbuild src/content/yahoo/index.ts --bundle --outfile=dist/yahoo-content.js --format=iife && esbuild src/background/index.ts --bundle --outfile=dist/service-worker.js --format=iife",
+    "build": "vite build && node scripts/build-extension.js",
     "build:firefox": "npm run build && node scripts/build-firefox.js",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
