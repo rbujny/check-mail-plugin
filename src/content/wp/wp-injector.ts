@@ -172,38 +172,37 @@ function createRawShieldButton(): HTMLButtonElement {
     button.setAttribute(ICON_MARKER, 'raw'); // Distinct marker for raw view
     button.setAttribute('title', 'Extract Raw Original');
     button.setAttribute('aria-label', 'Extract Raw Original');
-    button.innerHTML = `${SHIELD_ICON_SVG}<span style="margin-left: 6px; font-size: 13px; font-family: Arial, sans-serif;">Scan with CheckMail</span>`;
+    button.innerHTML = SHIELD_ICON_SVG;
 
     Object.assign(button.style, {
         position: 'fixed',
         top: '10px',
         right: '10px',
         zIndex: '999999',
-        background: '#1a73e8',
-        color: '#ffffff',
+        background: 'transparent',
+        color: '#5f6368',
         border: 'none',
         cursor: 'pointer',
-        padding: '8px 16px',
-        borderRadius: '24px',
+        padding: '8px',
+        width: '40px',
+        height: '40px',
+        borderRadius: '5px', // Match WP's slightly rounded square button style if it's there, or 50% for circle. I'll use 8px to match modern rounded squares or 4px.
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
-        fontFamily: 'Arial, sans-serif',
-        fontSize: '13px',
-        fontWeight: 'bold',
-        transition: 'background 0.2s ease, box-shadow 0.2s ease',
+        opacity: '0.7',
+        transition: 'background-color 0.2s ease, opacity 0.2s ease',
     });
 
     button.addEventListener('mouseenter', () => {
-        button.style.background = '#1765cc';
-        button.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+        button.style.backgroundColor = 'rgba(0, 0, 0, 0.06)';
+        button.style.opacity = '1';
     });
 
     button.addEventListener('mouseleave', () => {
         if (!button.dataset.extracting) {
-            button.style.background = '#1a73e8';
-            button.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.25)';
+            button.style.opacity = '0.7';
+            button.style.backgroundColor = 'transparent';
         }
     });
 
@@ -216,7 +215,8 @@ function createRawShieldButton(): HTMLButtonElement {
 
         // Brief visual loading state — icon color change (FR-007)
         button.dataset.extracting = 'true';
-        button.style.background = '#ffa000';
+        button.style.opacity = '1';
+        button.style.color = '#1a73e8';
 
         try {
             const rawText = extractWpRawContent();
@@ -264,13 +264,14 @@ function createRawShieldButton(): HTMLButtonElement {
             const payload = optimizeEmailData(rawHeaders, decodedBody);
             chrome.runtime.sendMessage({ type: 'PROCESS_EMAIL', payload });
 
-            button.style.background = '#34a853'; // success
+            button.style.color = '#34a853'; // success
         } catch (error) {
-            button.style.background = '#ea4335'; // error
+            button.style.color = '#ea4335'; // error
             console.error('[CheckMailPlugin][WP] Raw extraction failed:', error);
         } finally {
             setTimeout(() => {
-                button.style.background = '#1a73e8';
+                button.style.color = '#5f6368';
+                button.style.opacity = '0.7';
                 delete button.dataset.extracting;
             }, 1500);
         }
@@ -306,8 +307,8 @@ export function injectWpRawIcon(): void {
             // Append to modal
             Object.assign(button.style, {
                 position: 'absolute',
-                top: '16px',
-                right: '48px', // Avoid overlap with native close button
+                top: '24px',
+                right: '72px', // Make room for 40px close button + 8px gap
             });
             modalTitle.parentElement.appendChild(button);
         } else {

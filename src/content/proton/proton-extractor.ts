@@ -9,16 +9,17 @@ import type { EmailData, ExtractionResult } from '../../types/email';
 export function extractProtonEmailContent(container: HTMLElement): ExtractionResult {
     const warnings: string[] = [];
 
-    // ProtonMail selectors (refined from live inspection)
+    // ProtonMail selectors (refined from live inspection and shadow DOM awareness)
     const selectors = {
-        subject: '[data-testid="conversation-header:subject"], [data-testid^="message-view"] h1, .message-subject',
-        from: '[data-testid="recipients:sender"], .message-sender',
+        subject: '[data-testid="conversation-header:subject"], [data-testid="message-subject"], [data-testid^="message-view"] h1, h1.text-3xl, .message-subject',
+        from: '[data-testid="recipients:sender"], [data-testid="message-header-sender"], .message-sender',
         to: '[data-testid^="recipients:item-"]',
-        body: '[data-testid^="message-view"] .message-content iframe, [data-testid^="message-view"] .message-content, #message-body',
-        date: '[data-testid^="message-view"] time, .message-date-time'
+        body: '[data-testid^="message-view"] .message-content iframe, [data-testid^="message-view"] .message-content, #message-body, .message-content',
+        date: '[data-testid^="message-view"] time, [data-testid="message-header-date"], .message-date-time'
     };
 
-    const subjectEl = container.querySelector(selectors.subject);
+    // Sometimes subject is only in the main conversation header, outside the specific message container
+    const subjectEl = container.querySelector(selectors.subject) || document.querySelector(selectors.subject);
     const fromEl = container.querySelector(selectors.from);
     const toEls = Array.from(container.querySelectorAll(selectors.to));
     const bodyEl = container.querySelector(selectors.body);
@@ -33,17 +34,45 @@ export function extractProtonEmailContent(container: HTMLElement): ExtractionRes
         return text.replace(/Show details|Pokaż szczegóły/gi, '').trim();
     }).filter(Boolean);
     
-    // Body content handling (handle iframe)
+    // Body content handling (Pierce Shadow DOM & iframes, get innerHTML for link extraction)
     let bodyText = '';
-    if (bodyEl instanceof HTMLIFrameElement) {
-        try {
-            bodyText = bodyEl.contentDocument?.body?.innerText || bodyEl.contentWindow?.document?.body?.innerText || '';
-        } catch (e) {
-            console.warn('[CheckMailPlugin] Could not access Proton body iframe content:', e);
-            bodyText = bodyEl.title || ''; // Fallback
+    
+    // Find all possible body hosts (including children of the main selector)
+    const contentHosts = Array.from(container.querySelectorAll('.message-content, [data-testid="message-content"]'));
+    if (bodyEl && !contentHosts.includes(bodyEl as HTMLElement)) {
+        contentHosts.push(bodyEl as HTMLElement);
+    }
+    
+    for (const host of contentHosts) {
+        if (host instanceof HTMLIFrameElement) {
+            try {
+                bodyText = host.contentDocument?.body?.innerHTML || host.contentWindow?.document?.body?.innerHTML || '';
+                if (bodyText) break;
+            } catch (e) {
+                console.warn('[CheckMailPlugin] Could not access Proton body iframe content:', e);
+            }
+        } else if (host.shadowRoot) {
+            // Proton often isolates email HTML using Shadow DOM
+            const protonRoot = host.shadowRoot.getElementById('proton-root');
+            bodyText = protonRoot ? protonRoot.innerHTML : host.shadowRoot.innerHTML;
+            if (bodyText) break;
+        } else {
+            // Check direct children for shadow roots as well (sometimes wrapper elements don't host the shadow themselves)
+            const childWithShadow = Array.from(host.children).find(c => c.shadowRoot);
+            if (childWithShadow?.shadowRoot) {
+                const protonRoot = childWithShadow.shadowRoot.getElementById('proton-root');
+                bodyText = protonRoot ? protonRoot.innerHTML : childWithShadow.shadowRoot.innerHTML;
+                if (bodyText) break;
+            }
+            // Standard fallback
+            bodyText = host.innerHTML || '';
+            if (bodyText && bodyText.trim().length > 0) break;
         }
-    } else {
-        bodyText = (bodyEl as HTMLElement | null)?.innerText?.trim() || '';
+    }
+    
+    // Absolute fallback if everything else fails
+    if (!bodyText && bodyEl) {
+        bodyText = (bodyEl as HTMLElement).innerHTML || (bodyEl as HTMLElement).textContent || bodyEl.getAttribute('title') || '';
     }
     
     const date = dateEl?.getAttribute('title') || dateEl?.textContent?.trim() || new Date().toLocaleString();

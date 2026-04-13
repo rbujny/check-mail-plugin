@@ -27,10 +27,8 @@ const SIZE_WARNING_THRESHOLD = 5 * 1024 * 1024;
  * Falls back to semantic DOM scanning if primary selector fails.
  */
 function findYahooToolbar(): HTMLElement | null {
-    // Primary: Yahoo uses data-test-id for toolbar
-    const toolbar =
-        document.querySelector<HTMLElement>('[data-test-id="message-toolbar"] [role="toolbar"]') ||
-        document.querySelector<HTMLElement>('[role="toolbar"][data-test-id="focus-group"]');
+    // Primary: Yahoo uses data-test-id="focus-group" for the actual flex row containing buttons
+    const toolbar = document.querySelector<HTMLElement>('[data-test-id="focus-group"][role="toolbar"]');
 
     if (toolbar) return toolbar;
 
@@ -60,7 +58,7 @@ function createStandardShieldButton(): HTMLButtonElement {
         background: 'none',
         border: 'none',
         cursor: 'pointer',
-        padding: '6px 8px',
+        padding: '6px 8px', // Restore standard padding
         margin: '0 4px',
         borderRadius: '4px',
         display: 'inline-flex',
