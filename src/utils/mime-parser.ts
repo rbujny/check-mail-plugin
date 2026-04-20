@@ -28,10 +28,15 @@ export function extractBodyFromMime(rawBody: string): string {
     // Or we have a single part email still containing top-level headers.
     if (chunks.length <= 1) {
         const match = rawBody.match(/^([\s\S]*?)\r?\n\r?\n([\s\S]*)$/i);
-        let fbContent = match ? match[2] : rawBody;
+        if (!match) {
+            if (/^Received:/i.test(rawBody) || /^Return-Path:/i.test(rawBody) || /^MIME-Version:/i.test(rawBody)) {
+                return ''; // It's just a block of headers
+            }
+            return stripLeadingChunkSize(rawBody);
+        }
 
         // Remove trailing chunk length bleeding into the body by trimming initial newlines
-        return stripLeadingChunkSize(fbContent);
+        return stripLeadingChunkSize(match[2]);
     }
 
     const parts: { content: string, isHtml: boolean }[] = [];
@@ -64,10 +69,15 @@ export function extractBodyFromMime(rawBody: string): string {
         // Fallback: Just try to strip main headers from the first chunk 
         // if no explicit html/plain type matched
         const match = rawBody.match(/^([\s\S]*?)\r?\n\r?\n([\s\S]*)$/i);
-        let fbContent = match ? match[2] : rawBody;
+        if (!match) {
+            if (/^Received:/i.test(rawBody) || /^Return-Path:/i.test(rawBody) || /^MIME-Version:/i.test(rawBody)) {
+                return ''; // It's just a block of headers
+            }
+            return stripLeadingChunkSize(rawBody);
+        }
 
         // Remove trailing chunk length bleeding into the body by trimming initial newlines
-        return stripLeadingChunkSize(fbContent);
+        return stripLeadingChunkSize(match[2]);
     }
 
     // Prefer HTML over plain text

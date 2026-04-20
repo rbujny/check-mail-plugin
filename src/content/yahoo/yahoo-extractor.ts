@@ -30,11 +30,11 @@ export function extractYahooEmailContent(container: HTMLElement): ExtractionResu
         container.querySelector('.message-header-date');
 
     const subject = subjectEl?.textContent?.trim() || '';
-    
+
     // In Yahoo, the 'From' name is often in a contact card anchor.
     // We try to get the full identity from title/aria-label if available.
     const from = fromEl?.getAttribute('title') || fromEl?.getAttribute('aria-label') || fromEl?.textContent?.trim() || '';
-    
+
     // Language-independent recipient extraction:
     // The first span child is consistently the label (e.g. "To:", "Do:", "Cc:").
     // Subsequent children are the actual recipient names/tokens.
@@ -48,7 +48,7 @@ export function extractYahooEmailContent(container: HTMLElement): ExtractionResu
         })
         .filter(text => text && text !== ',' && text !== ';' && text !== ' ');
 
-    const bodyText = (bodyEl as HTMLElement | null)?.innerText?.trim() || '';
+    const bodyText = (bodyEl as HTMLElement | null)?.innerHTML?.trim() || (bodyEl as HTMLElement | null)?.innerText?.trim() || '';
     const date = dateEl?.textContent?.trim() || new Date().toLocaleString();
 
     if (!subject) warnings.push('Subject not found');

@@ -8,13 +8,14 @@ A privacy-focused browser extension that extracts and optimizes email data for s
   - **Gmail**: Deep integration for standard and threaded message views.
   - **Yahoo Mail**: Support for both standard message views and the "View Raw Message" API view.
   - **Outlook**: Support for Outlook.com, Office 365, and desktop views including raw message extraction.
-  - **ProtonMail**: Support for standard and "View headers" views.
   - **WP Mail** 🇵🇱: Polish provider support for `poczta.wp.pl` — standard and raw source extraction.
   - **Onet Mail** 🇵🇱: Polish provider support for `poczta.onet.pl` — standard and raw source extraction.
   - **Interia Mail** 🇵🇱: Polish provider support for `poczta.interia.pl` — standard and raw source extraction.
 - **Privacy First**: All processing happens locally. Emails are optimized (stripped of signatures and tracking headers, truncated for LLM analysis) before leaving the browser.
 - **Security Analysis Ready**: Extracts SPF/DKIM/DMARC verdicts and the full `Received` chain from raw views.
 - **Payload Safety**: Handles large payloads (>5MB) with warnings and debounces extractions to prevent browser lag.
+- **Universal Notification System**: Injects modern, shadow-DOM encapsulated UI overlays (Toast/Modals) across all supported email providers to display scan results (`OK`, `WARNING`, `PHISHING`) without conflicting with native website CSS.
+- **Internationalization (I18n)**: Fully supports multi-language UI via browser native `_locales` (currently `en` and `pl`), automatically adjusting button texts and alert modals based on the user's browser language.
 
 ## Technology Stack
 
@@ -57,7 +58,7 @@ A privacy-focused browser extension that extracts and optimizes email data for s
 ### Gmail
 - Open any email.
 - Click the **Shield Icon** 🛡️ in the email toolbar (next to Print).
-- The optimized data will be logged to the background service worker or visible in the console.
+- The optimized payload is sent to the backend, and you will see a UI overlay notification with the server's verdict.
 
 ### Yahoo Mail
 - **Standard View**: Find the shield icon in the message action toolbar.
@@ -68,10 +69,6 @@ A privacy-focused browser extension that extracts and optimizes email data for s
 - Click the **Shield Icon** 🛡️ in the email toolbar.
 - For raw extraction, open "View message source" and click the floating button.
 
-### ProtonMail
-- Open any email in ProtonMail.
-- Click the **Shield Icon** 🛡️ in the email toolbar.
-- For raw extraction, open "View headers" and click the floating button.
 
 ### WP Mail (poczta.wp.pl) 🇵🇱
 - **Standard View**: Find the shield icon in the message action toolbar.

@@ -60,7 +60,7 @@ function createShieldButton(): HTMLButtonElement {
     button.setAttribute(ICON_MARKER, 'true');
     button.setAttribute('title', 'Extract Raw Original');
     button.setAttribute('aria-label', 'Extract Raw Original');
-    button.innerHTML = `${SHIELD_ICON_SVG}<span style="margin-left: 6px; font-size: 13px; font-family: Arial, sans-serif;">Scan with CheckMail</span>`;
+    button.innerHTML = `${SHIELD_ICON_SVG}<span style="margin-left: 6px; font-size: 13px; font-family: Arial, sans-serif;">${chrome.i18n.getMessage("scanButtonText")}</span>`;
 
     // Apply raw view specific styling (similar to standard links inside the action row)
     Object.assign(button.style, {

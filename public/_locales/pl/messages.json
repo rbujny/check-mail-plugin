@@ -1,0 +1,30 @@
+{
+  "scanButtonText": {
+    "message": "Skanuj z CheckMail",
+    "description": "Tekst na przycisku skanowania"
+  },
+  "scanRawButtonTitle": {
+    "message": "Wydobądź oryginalne źródło",
+    "description": "Tooltip dla przycisku widoku surowego"
+  },
+  "tierOkTitle": {
+    "message": "Bezpieczna wiadomość",
+    "description": "Tytuł dla nakładki bezpiecznej wiadomości"
+  },
+  "tierWarningTitle": {
+    "message": "Ostrzeżenie",
+    "description": "Tytuł dla nakładki ostrzeżenia"
+  },
+  "tierPhishingTitle": {
+    "message": "WYKRYTO PHISHING!",
+    "description": "Tytuł dla nakładki wyłudzania informacji"
+  },
+  "closeButtonText": {
+    "message": "Zamknij",
+    "description": "Tekst na przycisku zamykania"
+  },
+  "understoodButtonText": {
+    "message": "Zrozumiałem, uważam!",
+    "description": "Tekst na przycisku zrozumienia przy phishingu"
+  }
+}

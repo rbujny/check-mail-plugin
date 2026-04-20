@@ -12,13 +12,13 @@ export function extractOutlookEmailContent(container: HTMLElement): ExtractionRe
     // Outlook selectors (refined to avoid navigation collisions)
     const selectors = {
         // Specifically look for subject in the reading pane
-        subject: '[data-testid="ReadingPaneSubject"], h2[id^="subject_"]',
+        subject: '[id$="_SUBJECT"] span[title], [id$="_SUBJECT"], [data-testid="ReadingPaneSubject"], h2[id^="subject_"]',
         // Sender info using test IDs or common persona classes
-        from: '[data-testid="PersonaHeader"], [data-test-id="PersonaHeader"], .ms-Persona',
+        from: '[id$="_FROM"] span[aria-label], [id$="_FROM"] .OZZZK, [id$="_FROM"], [data-testid="PersonaHeader"], [data-test-id="PersonaHeader"], .ms-Persona',
         // Recipients
-        to: '[data-testid="RecipientAddress"], [data-testid="RecipientName"]',
+        to: '[id$="_TO"] span.f1ee13vk, [id$="_TO"] [aria-label], [id$="_TO"], [data-testid="RecipientAddress"], [data-testid="RecipientName"]',
         // Body content
-        body: '#Item.MessagePartBody, .x_content, .reading-pane-section, [role="main"] .allowTextSelection',
+        body: '[id^="UniqueMessageBody_"], [aria-label="Treść wiadomości"][role="document"], #Item.MessagePartBody, .x_content, .reading-pane-section, [role="main"] .allowTextSelection',
     };
 
     const subjectEl = container.querySelector(selectors.subject) || 
@@ -46,8 +46,8 @@ export function extractOutlookEmailContent(container: HTMLElement): ExtractionRe
     // Recipients
     const to = toEl ? [toEl.textContent?.replace(/^[^:]+:\s*/i, '').trim() || ''] : [];
 
-    // Body content handling - prioritize innerText for formatting preservation
-    const bodyText = (bodyEl as HTMLElement | null)?.innerText?.trim() || '';
+    // Body content handling - prioritize innerHTML for formatting preservation and link extraction
+    const bodyText = (bodyEl as HTMLElement | null)?.innerHTML?.trim() || (bodyEl as HTMLElement | null)?.innerText?.trim() || '';
     
     // Date extraction
     const dateEl = container.querySelector('[id*="Date"]') || container.querySelector('time');

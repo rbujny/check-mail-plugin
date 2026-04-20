@@ -105,7 +105,11 @@ function extractRecipients(container: HTMLElement): { to: string[]; cc: string[]
         to.push('[extraction failed]');
     }
 
-    return { to, cc };
+    // Deduplicate recipients
+    return { 
+        to: Array.from(new Set(to)), 
+        cc: Array.from(new Set(cc)) 
+    };
 }
 
 /**

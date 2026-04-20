@@ -143,10 +143,8 @@ export function extractOnetEmailContent(container: HTMLElement): ExtractionResul
 
     if (iframe) {
         try {
-            bodyText =
-                iframe.contentDocument?.body?.innerText?.trim() ||
-                iframe.contentWindow?.document?.body?.innerText?.trim() ||
-                '';
+            const bodyEl = iframe.contentDocument?.body || iframe.contentWindow?.document?.body;
+            bodyText = bodyEl?.innerHTML?.trim() || bodyEl?.innerText?.trim() || '';
         } catch (e) {
             console.warn('[CheckMailPlugin][Onet] Could not access iframe body:', e);
         }
@@ -156,7 +154,7 @@ export function extractOnetEmailContent(container: HTMLElement): ExtractionResul
     if (!bodyText) {
         const iframeWrapper = container.querySelector('div.mail-detail-iframe');
         if (iframeWrapper) {
-            bodyText = (iframeWrapper as HTMLElement).innerText?.trim() || '';
+            bodyText = (iframeWrapper as HTMLElement).innerHTML?.trim() || (iframeWrapper as HTMLElement).innerText?.trim() || '';
         }
     }
 

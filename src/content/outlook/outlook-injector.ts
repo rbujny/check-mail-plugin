@@ -34,8 +34,8 @@ function findOutlookToolbar(): HTMLElement | null {
 function createStandardShieldButton(): HTMLButtonElement {
     const button = document.createElement('button');
     button.setAttribute(ICON_MARKER, 'true');
-    button.setAttribute('title', 'Scan with CheckMail');
-    button.setAttribute('aria-label', 'Scan with CheckMail');
+    button.setAttribute('title', chrome.i18n.getMessage("scanButtonText"));
+    button.setAttribute('aria-label', chrome.i18n.getMessage("scanButtonText"));
     button.innerHTML = SHIELD_ICON_SVG;
 
     Object.assign(button.style, {
@@ -125,7 +125,7 @@ function createRawShieldButton(): HTMLButtonElement {
     const button = document.createElement('button');
     button.setAttribute(ICON_MARKER, 'raw');
     button.setAttribute('title', 'Extract Raw Original');
-    button.innerHTML = `${SHIELD_ICON_SVG}<span style="margin-left: 8px;">Scan with CheckMail</span>`;
+    button.innerHTML = `${SHIELD_ICON_SVG}<span style="margin-left: 8px;">${chrome.i18n.getMessage("scanButtonText")}</span>`;
 
     // Modern Fluent UI Primary/Ghost button hybrid style
     Object.assign(button.style, {

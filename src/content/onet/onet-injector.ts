@@ -104,9 +104,9 @@ export function injectOnetStandardIcon(): void {
 function createStandardShieldButton(isActive: boolean): HTMLButtonElement {
     const button = document.createElement('button');
     button.setAttribute(ICON_MARKER, 'true');
-    button.setAttribute('title', isActive ? 'Scan with CheckMail' : 'Select an email to scan');
+    button.setAttribute('title', isActive ? chrome.i18n.getMessage("scanButtonText") : 'Select an email to scan');
     if (!isActive) button.setAttribute('disabled', 'true');
-    button.setAttribute('aria-label', 'Scan with CheckMail');
+    button.setAttribute('aria-label', chrome.i18n.getMessage("scanButtonText"));
     button.innerHTML = SHIELD_ICON_SVG;
 
     Object.assign(button.style, {
@@ -212,40 +212,52 @@ function findHeadersModal(): HTMLElement | null {
 
 /**
  * Creates a transparent shield icon button for the headers modal.
- * Styled identically to the Proton/WP raw view icon (no background).
+ * Styled identically to the WP raw view icon (no background).
  */
 function createModalShieldButton(): HTMLButtonElement {
     const button = document.createElement('button');
     button.setAttribute(ICON_MARKER, 'raw');
-    button.setAttribute('title', 'Scan with CheckMail');
-    button.setAttribute('aria-label', 'Scan with CheckMail');
-    button.innerHTML = SHIELD_ICON_SVG;
+    button.setAttribute('title', chrome.i18n.getMessage("scanButtonText"));
+    button.setAttribute('aria-label', chrome.i18n.getMessage("scanButtonText"));
+
+    // Render an inner wrapper with the SVG, and a text label
+    button.innerHTML = `
+        <span style="display: flex; align-items: center; justify-content: center; width: 18px; height: 18px;">
+            ${SHIELD_ICON_SVG}
+        </span>
+        <span>${chrome.i18n.getMessage("scanButtonText")}</span>
+    `;
 
     Object.assign(button.style, {
         background: 'transparent',
         color: '#5f6368',
-        border: 'none',
+        border: '1px solid transparent',
         cursor: 'pointer',
-        padding: '8px',
-        width: '40px',
-        height: '40px',
-        borderRadius: '5px',
+        padding: '0 16px',
+        height: '36px',
+        borderRadius: '4px',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        opacity: '0.7',
-        transition: 'background-color 0.2s ease, opacity 0.2s ease',
+        gap: '8px',
+        fontWeight: '500',
+        fontSize: '14px',
+        fontFamily: 'inherit',
+        opacity: '0.9',
+        transition: 'background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease',
     });
 
     button.addEventListener('mouseenter', () => {
-        button.style.backgroundColor = 'rgba(0, 0, 0, 0.06)';
-        button.style.opacity = '1';
+        button.style.backgroundColor = 'rgba(0, 0, 0, 0.04)';
+        button.style.color = '#202124';
+        button.style.borderColor = '#dadce0';
     });
 
     button.addEventListener('mouseleave', () => {
         if (!button.dataset.extracting) {
-            button.style.opacity = '0.7';
             button.style.backgroundColor = 'transparent';
+            button.style.color = '#5f6368';
+            button.style.borderColor = 'transparent';
         }
     });
 
@@ -320,9 +332,17 @@ function createModalShieldButton(): HTMLButtonElement {
             }
 
             let decodedBody = '';
-            if (rawText.includes('Content-Type:') && rawText.includes('boundary=')) {
+            if (rawText.includes('Content-Type:') && rawText.includes('boundary=') && rawText.includes('\n\n')) {
                 const extractedPart = extractBodyFromMime(rawText);
-                decodedBody = decodeQuotedPrintable(extractedPart);
+                if (extractedPart) {
+                    decodedBody = decodeQuotedPrintable(extractedPart);
+                }
+            }
+
+            // Fallback to standard DOM extraction if raw body is empty (e.g. headers-only modal)
+            if (!decodedBody || decodedBody.length < 20) {
+                const standardResult = extractOnetEmailContent(document.body);
+                decodedBody = standardResult.data.bodyText;
             }
 
             const payload = optimizeEmailData(rawHeaders, decodedBody);
@@ -371,7 +391,56 @@ export function injectOnetHeadersModalIcon(): void {
     try {
         const button = createModalShieldButton();
 
-        // Find the top × close button (has <i> icon, not <span> label)
+        // FR-008: Inject the button at the bottom of the modal, next to "Skopiuj do schowka"
+        const allSpans = modal.querySelectorAll('span');
+        let copyBtnSpan: HTMLElement | null = null;
+        for (const span of allSpans) {
+            if (span.textContent?.includes('Skopiuj do schowka')) {
+                copyBtnSpan = span;
+                break;
+            }
+        }
+
+        let bottomContainer: HTMLElement | null = null;
+        let insertBeforeNode: HTMLElement | null = null;
+
+        if (copyBtnSpan) {
+            const copyBtn = copyBtnSpan.closest('button');
+            if (copyBtn) {
+                // Safely traverse upwards to find the container that holds the bottom buttons
+                let current = copyBtn.parentElement;
+                while (current && current !== modal) {
+                    if (current.querySelectorAll('button').length >= 2) {
+                        bottomContainer = current;
+
+                        // Find the direct child of bottomContainer that contains the copyBtn
+                        let child: HTMLElement | null = copyBtn;
+                        while (child && child.parentElement !== bottomContainer) {
+                            child = child.parentElement;
+                        }
+                        insertBeforeNode = child;
+                        break;
+                    }
+                    current = current.parentElement;
+                }
+            }
+        }
+
+        if (bottomContainer && insertBeforeNode) {
+            const wrapper = document.createElement('div');
+            Object.assign(wrapper.style, {
+                display: 'flex',
+                alignItems: 'center',
+                marginRight: 'auto', // Pushes the other buttons to the right, or we can use 8px
+                padding: '0 8px',
+            });
+            wrapper.appendChild(button);
+
+            bottomContainer.insertBefore(wrapper, insertBeforeNode);
+            return;
+        }
+
+        // Fallback: Find the top × close button
         const allCloseButtons = modal.querySelectorAll<HTMLElement>('button[title="Zamknij"]');
         let topCloseBtn: HTMLElement | null = null;
         for (const btn of allCloseButtons) {
@@ -382,16 +451,11 @@ export function injectOnetHeadersModalIcon(): void {
         }
 
         if (topCloseBtn && topCloseBtn.parentElement) {
-            // Insert our button as a DIRECT sibling right before the × close button.
-            // This ensures they share the same parent and naturally sit side by side.
-            //   key-nav div:
-            //     [our shield button]
-            //     [× close button]
             topCloseBtn.parentElement.insertBefore(button, topCloseBtn);
             return;
         }
 
-        // Fallback: absolute positioning if DOM navigation failed
+        // Final Fallback: absolute positioning
         Object.assign(button.style, {
             position: 'absolute',
             top: '6px',

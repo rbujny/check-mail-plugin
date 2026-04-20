@@ -58,8 +58,8 @@ function findWpToolbar(): HTMLElement | null {
 function createStandardShieldButton(): HTMLButtonElement {
     const button = document.createElement('button');
     button.setAttribute(ICON_MARKER, 'true');
-    button.setAttribute('title', 'Scan with CheckMail');
-    button.setAttribute('aria-label', 'Scan with CheckMail');
+    button.setAttribute('title', chrome.i18n.getMessage("scanButtonText"));
+    button.setAttribute('aria-label', chrome.i18n.getMessage("scanButtonText"));
     button.innerHTML = SHIELD_ICON_SVG;
 
     Object.assign(button.style, {
@@ -170,39 +170,42 @@ export function injectWpStandardIcon(): void {
 function createRawShieldButton(): HTMLButtonElement {
     const button = document.createElement('button');
     button.setAttribute(ICON_MARKER, 'raw'); // Distinct marker for raw view
-    button.setAttribute('title', 'Extract Raw Original');
-    button.setAttribute('aria-label', 'Extract Raw Original');
-    button.innerHTML = SHIELD_ICON_SVG;
+    button.setAttribute('title', chrome.i18n.getMessage("scanRawButtonTitle") || 'Extract Raw Original');
+    button.setAttribute('aria-label', chrome.i18n.getMessage("scanRawButtonTitle") || 'Extract Raw Original');
+    button.innerHTML = `
+        <span style="display: flex; align-items: center; justify-content: center; width: 18px; height: 18px;">
+            ${SHIELD_ICON_SVG.replace('width="20" height="20"', 'width="18" height="18"')}
+        </span>
+        <span style="font-weight: 500; font-size: 14px;">${chrome.i18n.getMessage("scanButtonText") || 'Scan with CheckMail'}</span>
+    `;
 
     Object.assign(button.style, {
-        position: 'fixed',
-        top: '10px',
-        right: '10px',
-        zIndex: '999999',
-        background: 'transparent',
-        color: '#5f6368',
-        border: 'none',
+        background: '#ffffff',
+        border: '1px solid #c2c9d1',
         cursor: 'pointer',
-        padding: '8px',
-        width: '40px',
-        height: '40px',
-        borderRadius: '5px', // Match WP's slightly rounded square button style if it's there, or 50% for circle. I'll use 8px to match modern rounded squares or 4px.
+        padding: '0 16px',
+        margin: '0',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        opacity: '0.7',
-        transition: 'background-color 0.2s ease, opacity 0.2s ease',
+        gap: '8px',
+        color: '#344050',
+        height: '40px', // Match standard WP button height
+        borderRadius: '6px',
+        fontFamily: 'inherit',
+        transition: 'all 0.2s ease',
+        flex: '1', // Let it stretch evenly in the footer
     });
 
     button.addEventListener('mouseenter', () => {
-        button.style.backgroundColor = 'rgba(0, 0, 0, 0.06)';
-        button.style.opacity = '1';
+        button.style.background = '#f3f4f6';
+        button.style.borderColor = '#9ca3af';
     });
 
     button.addEventListener('mouseleave', () => {
         if (!button.dataset.extracting) {
-            button.style.opacity = '0.7';
-            button.style.backgroundColor = 'transparent';
+            button.style.background = '#ffffff';
+            button.style.borderColor = '#c2c9d1';
         }
     });
 
@@ -215,8 +218,9 @@ function createRawShieldButton(): HTMLButtonElement {
 
         // Brief visual loading state — icon color change (FR-007)
         button.dataset.extracting = 'true';
-        button.style.opacity = '1';
         button.style.color = '#1a73e8';
+        button.style.borderColor = '#1a73e8';
+        button.style.background = '#f0fdf4';
 
         try {
             const rawText = extractWpRawContent();
@@ -270,8 +274,9 @@ function createRawShieldButton(): HTMLButtonElement {
             console.error('[CheckMailPlugin][WP] Raw extraction failed:', error);
         } finally {
             setTimeout(() => {
-                button.style.color = '#5f6368';
-                button.style.opacity = '0.7';
+                button.style.color = '#344050';
+                button.style.borderColor = '#c2c9d1';
+                button.style.background = '#ffffff';
                 delete button.dataset.extracting;
             }, 1500);
         }
@@ -303,16 +308,23 @@ export function injectWpRawIcon(): void {
     try {
         const button = createRawShieldButton();
 
-        if (modalTitle && modalTitle.parentElement) {
-            // Append to modal
-            Object.assign(button.style, {
-                position: 'absolute',
-                top: '24px',
-                right: '72px', // Make room for 40px close button + 8px gap
-            });
-            modalTitle.parentElement.appendChild(button);
+        const modalFooter = modalTitle?.closest('div[role="dialog"], .modal')?.querySelector('.modal-footer, .modal__footer') as HTMLElement;
+
+        if (modalFooter) {
+            // Reconfigure the footer layout to place two buttons side-by-side nicely
+            modalFooter.style.display = 'flex';
+            modalFooter.style.gap = '12px';
+
+            // Wstawiamy nasz przycisk na sam początek (przed Zamknij)
+            modalFooter.insertBefore(button, modalFooter.firstChild);
         } else {
-            // Legacy full-page append
+            // Legacy fallback if modal footer is missing or full page
+            Object.assign(button.style, {
+                position: 'fixed',
+                top: '20px',
+                right: '20px',
+                flex: 'none'
+            });
             document.body.appendChild(button);
         }
     } catch (error) {

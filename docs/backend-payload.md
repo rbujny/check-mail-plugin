@@ -1,6 +1,6 @@
 # Dokumentacja Payloadu API (CheckMailPlugin -> Backend)
 
-Wtyczka zbiera dane z różnych klientów pocztowych (Gmail, Outlook, WP, Onet, Interia, Yahoo, Proton), jednak przed wysłaniem ich do backendu przechodzą one przez **współdzielony optymalizator** (`email-data-optimizer.ts`).
+Wtyczka zbiera dane z różnych klientów pocztowych (Gmail, Outlook, WP, Onet, Interia, Yahoo), jednak przed wysłaniem ich do backendu przechodzą one przez **współdzielony optymalizator** (`email-data-optimizer.ts`).
 
 Dzięki temu **format danych wysyłanych do backendu jest zawsze ujednolicony i identyczny dla każdego providera poczty**. Nie ma dedykowanego formatu na backendzie dla konkretnego dostawcy poczty — backend zawsze otrzymuje przewidywalny obiekt JSON.
 
@@ -53,11 +53,27 @@ Oto dokładna struktura wysyłanego JSON-a (`ProcessedEmailData`):
 | `truncated` | `boolean` | Flaga informująca backend (i ew. model LLM), czy oryginalna treść wiadomości przekraczała 1000 znaków i została sztucznie ucięta. |
 | `links` | `Array<string>` | Wyekstrahowana i pozbawiona duplikatów tablica linków z treści maila. Wyciąga protokoły HTTP/HTTPS, wektory ukryte w `mailto:`, a także próby wstrzyknięcia skryptów przez `data:`. Maksymalnie przesyła do 50 adresów URL. Dodatkowo każdy najdłuższy link jest ograniczany do max. 2048 znaków, by zapobiec atakom "Payload DoS" na złośliwie wydłużonych adresach. |
 
+## Oczekiwana odpowiedź (Response) od serwera
+
+Po przetworzeniu zrzuconego payloadu, backend musi zwrócić odpowiedź JSON, na podstawie której wtyczka wyświetli określony poziom zagrożenia (Severity Tier) na ekranie klienta:
+
+```json
+{
+  "result": "OK", // Możliwe wartości: "OK", "WARNING", "PHISHING"
+  "comment": "Wiadomość pochodzi z zaufanego źródła i przeszła weryfikację."
+}
+```
+
+### Typy zagrożeń (Severity Tiers) obsługiwane przez UI wtyczki:
+1. **`OK`** - Zielony komunikat (Toast) poświadczający absolutne bezpieczeństwo.
+2. **`WARNING`** - Pomarańczowe ostrzeżenie-banner wskazujące na anomalię, wymuszające uwagę przed przeczytaniem.
+3. **`PHISHING`** - Czerwony, dominujący modal z ostrym efektem wizualnym dla całkowicie potwierdzonych złośliwych wiadomości.
+
 ## Różnice u poszczególnych dostawców poczty (Min vs Max Case)
 
 Mimo że **format wyjściowy wysyłany do backendu w zapytaniu pozostaje zawsze identyczny**, istnieje olbrzymia różnica w tym, jak dużo danych dany webmail pozwala wyciągnąć ze swojego DOM w standardowym widoku (Min Case) w stosunku do widoku surowego "Pokaż źródło" / "Headers" (Max Case).
 
-Poniżej zestawienie dla zagranicznych providerów (dane na podstawie logów z wtyczki). *Polscy dostawcy (WP, Onet, Interia) zostaną zaktualizowani w późniejszym terminie.*
+Poniżej zestawienie dla poszczególnych providerów (w tym Gmail, Microsoft, Yahoo, Onet, Wirtualna Polska i Interia).
 
 ### 1. Gmail
 *   **Min Case (Widok standardowy):** Wtyczka wyciąga kompletne nagłówki podstawowe (`from`, `to`, `subject`), ładnie formatuje treść i wyciąga dziesiątki linków. Jednakże serwery przekierowań (`receivedChain`) oraz werdykty bezpieczeństwa (`securityVerdicts`) **zawsze są puste**, ponieważ interfejs Gmaila ich w ogóle nie ładuje dla klienta.
@@ -71,11 +87,6 @@ Poniżej zestawienie dla zagranicznych providerów (dane na podstawie logów z w
 *   **Min Case:** Yahoo w czystym widoku oddaje `from`, `to`, `subject` (często widocznym jest odcięcie reszty znaków), puste `receivedChain` i `securityVerdicts`.
 *   **Max Case (View Raw Message):** Bardzo bogaty `receivedChain` i pełne werdykty sprawdzania kryptograficznego w `securityVerdicts`. Pokazuje często również precyzyjne odróżnienie atrybutów `reply-to` i ukrytego `return-path`, które nie występują w zwykłym trybie.
 
-### 4. Proton (Wyjątek Architektoniczny!)
-Ze względu na specyfikę szwajcarskiego klienta i End-to-End Encryption (PGP):
-*   **Min Case:** Backend dostaje wyłącznie podstawowe `from`, `to`, puste `receivedChain` i `securityVerdicts`. Proton szyfruje cały payload klienta i podmienia DOM dynamicznie - w niektórych miejscach "surowe" zapytanie wyrzuci całkowicie puste `body: ""`.
-*   **Max Case (Widok nagłówków):** W związku ze specyfiką warstwy szyfrowania, w oryginalnym e-mailu pobranym jako plain text `receivedChain` jest **zawsze puste lub maksymalnie jednoelementowe**, ponieważ węzły internetowe nie są logowane w ten sam sposób co w nieszyfrowanej poczcie. `securityVerdicts` odbija brak werdyktów domenowych.  
-    **WAŻNE DLA BACKENDU:** W trybie MAX "surowe" nagłówki SMTP w Protonie lądują fizycznie scalone **na samej górze niesformatowanego stringa wewnątrz pola `body`**, po których tuż poniżej następuje blok danych `-----BEGIN PGP MESSAGE-----`. Wtedy zmienna blokowa `headers` dostanie zazwyczaj puste `{}`. Backend analizując ProtonMail musi być gotowy wyciągać te pola tekstem bezpośrednio ze szczytu pola `body`.
 
 ---
 

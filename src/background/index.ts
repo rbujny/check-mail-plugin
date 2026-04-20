@@ -40,6 +40,13 @@ export async function processEmailPayload(payload: ProcessedEmailData, tabId: nu
             clearTimeout(timeoutId);
 
             if (response.ok) {
+                const data = await response.json();
+                if (tabId) {
+                    chrome.tabs.sendMessage(tabId, {
+                        type: 'SHOW_SCAN_RESULT',
+                        payload: data
+                    });
+                }
                 success = true;
             } else {
                 throw new Error(`HTTP error! status: ${response.status}`);

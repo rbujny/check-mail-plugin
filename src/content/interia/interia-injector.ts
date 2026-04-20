@@ -22,66 +22,67 @@ const SIZE_WARNING_THRESHOLD = 5 * 1024 * 1024;
 // ─── Standard View ──────────────────────────────────────────────────
 
 /**
- * Finds the Interia Mail message toolbar in the standard view.
+ * Finds all instances of the Interia Mail message action toolbars.
+ * Interia can have standard and sticky toolbars simultaneously.
  */
-function findInteriaToolbar(): HTMLElement | null {
-    const toolbar =
-        document.querySelector<HTMLElement>('[data-qa="message-toolbar"]') ||
-        document.querySelector<HTMLElement>('[role="toolbar"]') ||
-        document.querySelector<HTMLElement>('.message-toolbar');
-
-    if (toolbar) return toolbar;
-
-    // Fallback: Look for Reply/Forward buttons and use their parent
-    const buttons = document.querySelectorAll<HTMLElement>('button');
-    for (const btn of buttons) {
-        const text = btn.textContent?.trim().toLowerCase() || '';
-        const qa = btn.getAttribute('data-qa') || '';
-        if (text === 'odpowiedz' || text === 'przekaż' || qa.includes('reply') || qa.includes('forward')) {
-            return btn.parentElement;
-        }
-    }
-
-    return null;
+function findInteriaToolbars(): HTMLElement[] {
+    return Array.from(document.querySelectorAll<HTMLElement>('ul.message__toolbar__actions'));
 }
 
 /**
- * Creates the shield button for the standard Interia Mail view.
+ * Creates the shield button wrapper for the standard Interia Mail view.
  */
-function createStandardShieldButton(): HTMLButtonElement {
+function createStandardShieldButton(): HTMLLIElement {
+    const li = document.createElement('li');
+    li.className = 'message__toolbar__actions__item';
+    li.setAttribute(ICON_MARKER, 'wrapper');
+    // Ensure inline display so it doesn't break the row and create a column!
+    li.style.display = 'inline-flex';
+    li.style.alignItems = 'center';
+    li.style.marginRight = '8px';
+
     const button = document.createElement('button');
     button.setAttribute(ICON_MARKER, 'true');
-    button.setAttribute('title', 'Scan with CheckMail');
-    button.setAttribute('aria-label', 'Scan with CheckMail');
-    button.innerHTML = SHIELD_ICON_SVG;
+    button.setAttribute('title', chrome.i18n.getMessage("scanButtonText"));
+    button.setAttribute('aria-label', chrome.i18n.getMessage("scanButtonText"));
+    
+    // Add text label and standard text button styling
+    button.innerHTML = `
+        <span style="display: flex; align-items: center; justify-content: center; width: 16px; height: 16px;">
+            ${SHIELD_ICON_SVG}
+        </span>
+        <span style="font-weight: 500; font-size: 13px;">${chrome.i18n.getMessage("scanButtonText")}</span>
+    `;
 
     Object.assign(button.style, {
-        background: 'none',
-        border: 'none',
+        background: 'transparent',
+        border: '1px solid #c2c9d1',
         cursor: 'pointer',
-        padding: '6px 8px',
-        margin: '0 4px',
-        borderRadius: '4px',
+        padding: '0 12px',
+        margin: '0',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        verticalAlign: 'middle',
-        opacity: '0.7',
-        transition: 'opacity 0.2s ease, background-color 0.2s ease',
-        color: '#5f6368',
-        minWidth: '24px',
-        minHeight: '24px',
+        gap: '6px',
+        opacity: '0.85',
+        transition: 'all 0.2s ease',
+        color: '#344050',
+        height: '28px',
+        borderRadius: '14px',
+        fontFamily: 'inherit',
     });
 
     button.addEventListener('mouseenter', () => {
         button.style.opacity = '1';
-        button.style.backgroundColor = 'rgba(0, 0, 0, 0.06)';
+        button.style.background = '#f3f4f6';
+        button.style.borderColor = '#9ca3af';
     });
 
     button.addEventListener('mouseleave', () => {
         if (!button.dataset.extracting) {
-            button.style.opacity = '0.7';
-            button.style.backgroundColor = 'transparent';
+            button.style.opacity = '0.85';
+            button.style.background = 'transparent';
+            button.style.borderColor = '#c2c9d1';
         }
     });
 
@@ -110,7 +111,16 @@ function createStandardShieldButton(): HTMLButtonElement {
             // If user opened "Szczegóły wiadomości", extract detailed raw headers
             const detailsTable = extractInteriaDetailsTable();
             if (detailsTable) {
-                rawHeaders = { ...rawHeaders, ...detailsTable };
+                // Selectively merge headers to avoid replacing clean UI Subject/From 
+                // with raw MIME encoded strings
+                if (detailsTable['X-Envelope-From']) {
+                    rawHeaders['Return-Path'] = detailsTable['X-Envelope-From'];
+                }
+                if (detailsTable['Reply-To']) {
+                    rawHeaders['Reply-To'] = detailsTable['Reply-To'];
+                }
+                // We do NOT spread all detailsTable headers into rawHeaders
+                // because it breaks parsing if it contains MIME encoded subject.
             }
 
             const payload = optimizeEmailData(rawHeaders, result.data.bodyText);
@@ -134,24 +144,36 @@ function createStandardShieldButton(): HTMLButtonElement {
         }
     });
 
-    return button;
+    li.appendChild(button);
+    return li;
 }
 
 /**
  * Inject the shield icon into the Interia Mail standard view toolbar.
  */
 export function injectInteriaStandardIcon(): void {
-    if (document.querySelector(`[${ICON_MARKER}]`)) {
-        return;
-    }
-
     try {
-        const toolbar = findInteriaToolbar();
-        if (toolbar) {
-            const button = createStandardShieldButton();
-            toolbar.appendChild(button);
-        } else {
-            console.warn('[CheckMailPlugin][Interia] Standard view: toolbar not found for injection');
+        const toolbars = findInteriaToolbars();
+        
+        for (const toolbar of toolbars) {
+            // Already injected in this toolbar?
+            if (toolbar.querySelector(`[${ICON_MARKER}]`)) {
+                continue;
+            }
+            
+            const liBlock = createStandardShieldButton();
+            
+            // Try to place it to the left of the star icon (as the first element)
+            let starLi: HTMLElement | null = null;
+            for (const child of Array.from(toolbar.children)) {
+               if (child.querySelector('.icon-star')) {
+                   starLi = child as HTMLElement;
+                   break;
+               }
+            }
+            
+            // Insert as first child or before star
+            toolbar.insertBefore(liBlock, starLi || toolbar.firstChild);
         }
     } catch (error) {
         console.error('[CheckMailPlugin][Interia] Graceful failure during standard injection:', error);
@@ -168,7 +190,7 @@ function createRawShieldButton(): HTMLButtonElement {
     button.setAttribute(ICON_MARKER, 'true');
     button.setAttribute('title', 'Extract Raw Original');
     button.setAttribute('aria-label', 'Extract Raw Original');
-    button.innerHTML = `${SHIELD_ICON_SVG}<span style="margin-left: 6px; font-size: 13px; font-family: Arial, sans-serif;">Scan with CheckMail</span>`;
+    button.innerHTML = `${SHIELD_ICON_SVG}<span style="margin-left: 6px; font-size: 13px; font-family: Arial, sans-serif;">${chrome.i18n.getMessage("scanButtonText")}</span>`;
 
     Object.assign(button.style, {
         position: 'fixed',

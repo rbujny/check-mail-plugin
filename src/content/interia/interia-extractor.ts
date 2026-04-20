@@ -62,11 +62,11 @@ export function extractInteriaEmailContent(container: HTMLElement): ExtractionRe
 
     const to = toContainer
         ? Array.from(toContainer.querySelectorAll('span, a'))
-              .map(el => el.getAttribute('data-tooltip') || el.getAttribute('title') || el.textContent?.trim() || '')
+              .map(el => (el.getAttribute('data-tooltip') || el.getAttribute('title') || el.textContent?.trim() || '').replace(/^Do:\s*/i, '').trim())
               .filter(text => text && text !== ',' && text !== ';' && !text.endsWith(':'))
         : [];
 
-    const bodyText = bodyEl?.innerText?.trim() || '';
+    const bodyText = bodyEl?.innerHTML?.trim() || bodyEl?.innerText?.trim() || '';
     const date = dateEl?.getAttribute('data-tooltip') || dateEl?.textContent?.trim() || new Date().toLocaleString();
 
     if (!subject) warnings.push('Subject not found');

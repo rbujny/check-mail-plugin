@@ -1,0 +1,30 @@
+{
+  "scanButtonText": {
+    "message": "Scan with CheckMail",
+    "description": "Text on the scan button"
+  },
+  "scanRawButtonTitle": {
+    "message": "Extract Raw Original",
+    "description": "Tooltip for the raw view extraction button"
+  },
+  "tierOkTitle": {
+    "message": "Safe Message",
+    "description": "Title for the safe message overlay"
+  },
+  "tierWarningTitle": {
+    "message": "Warning",
+    "description": "Title for the warning message overlay"
+  },
+  "tierPhishingTitle": {
+    "message": "PHISHING DETECTED!",
+    "description": "Title for the phishing message overlay"
+  },
+  "closeButtonText": {
+    "message": "Close",
+    "description": "Text on the close button"
+  },
+  "understoodButtonText": {
+    "message": "I understand, I'll be careful!",
+    "description": "Text on the understood button for phishing"
+  }
+}

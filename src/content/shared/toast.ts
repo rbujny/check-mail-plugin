@@ -39,10 +39,14 @@ export function showToastError(message: string): void {
     }, 5000);
 }
 
+import { showScanResult } from './result-ui';
+
 export function setupMessageListener(): void {
     chrome.runtime.onMessage.addListener((request) => {
         if (request.type === 'SHOW_TOAST_ERROR') {
             showToastError(request.message);
+        } else if (request.type === 'SHOW_SCAN_RESULT' && request.payload) {
+            showScanResult(request.payload);
         }
     });
 }

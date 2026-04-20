@@ -2,7 +2,8 @@
     "manifest_version": 3,
     "name": "CheckMailPlugin",
     "version": "0.1.0",
-    "description": "Phishing detection assistant — extracts email content from Gmail, Yahoo, Outlook, Proton, WP, Onet, and Interia for analysis.",
+    "default_locale": "en",
+    "description": "Phishing detection assistant — extracts email content from Gmail, Yahoo, Outlook, WP, Onet, and Interia for analysis.",
     "permissions": [],
     "host_permissions": [
         "https://mail.google.com/*",
@@ -11,7 +12,6 @@
         "https://outlook.live.com/*",
         "https://outlook.office.com/*",
         "https://outlook.office365.com/*",
-        "https://mail.proton.me/*",
         "https://poczta.wp.pl/*",
         "https://poczta.onet.pl/*",
         "https://poczta.interia.pl/*",
@@ -55,15 +55,6 @@
             ],
             "js": [
                 "outlook-content.js"
-            ],
-            "run_at": "document_idle"
-        },
-        {
-            "matches": [
-                "https://*.proton.me/*"
-            ],
-            "js": [
-                "proton-content.js"
             ],
             "run_at": "document_idle"
         },

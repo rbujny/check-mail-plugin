@@ -103,8 +103,8 @@ function findToolbar(messageContainer: HTMLElement): HTMLElement | null {
 function createIconButton(messageContainer: HTMLElement): HTMLButtonElement {
     const button = document.createElement('button');
     button.setAttribute(ICON_MARKER, 'true');
-    button.setAttribute('title', 'Scan with CheckMail');
-    button.setAttribute('aria-label', 'Scan with CheckMail');
+    button.setAttribute('title', chrome.i18n.getMessage("scanButtonText"));
+    button.setAttribute('aria-label', chrome.i18n.getMessage("scanButtonText"));
     button.innerHTML = SHIELD_ICON_SVG;
 
     // Style to match Gmail's native toolbar buttons

@@ -25,8 +25,6 @@ const entries = [
     { input: 'src/content/yahoo/index.ts', output: 'yahoo-content.js' },
     // Outlook
     { input: 'src/content/outlook/index.ts', output: 'outlook-content.js' },
-    // ProtonMail
-    { input: 'src/content/proton/index.ts', output: 'proton-content.js' },
     // WP
     { input: 'src/content/wp/index.ts', output: 'wp-content.js' },
     // Onet
