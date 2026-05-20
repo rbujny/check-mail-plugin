@@ -1,0 +1,111 @@
+openapi: 3.0.3
+info:
+  title: CheckMail Plugin Backend API
+  version: 1.0.0
+  description: >
+    API documentation for the CheckMail Plugin backend endpoint. 
+    This endpoint is used by the browser extension to verify email payloads for phishing.
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+paths:
+  /process.php:
+    post:
+      summary: Process an email for phishing check
+      description: Receives a `ProcessedEmailData` payload from the browser extension and returns a verdict (OK, WARNING, PHISHING).
+      operationId: processEmail
+      requestBody:
+        description: The processed email data containing headers, security verdicts, and extracted links.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProcessedEmailData'
+      responses:
+        '200':
+          description: Successful response with the scanning result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessResponse'
+        '400':
+          description: Invalid JSON payload.
+        '405':
+          description: Method Not Allowed. Only POST is allowed.
+components:
+  schemas:
+    ProcessedEmailData:
+      type: object
+      required:
+        - headers
+        - receivedChain
+        - securityVerdicts
+        - body
+        - truncated
+        - links
+      properties:
+        headers:
+          type: object
+          description: Only selected headers such as to, from, subject, reply-to. Keys are lowercase.
+          properties:
+            from:
+              type: string
+            to:
+              type: string
+            subject:
+              type: string
+            reply-to:
+              type: string
+            return-path:
+              type: string
+          additionalProperties: false
+          example:
+            from: "sender@example.com"
+            to: "recipient@example.com"
+            subject: "Urgent Action Required"
+        receivedChain:
+          type: array
+          description: Ordered list of Received header values from the original email.
+          items:
+            type: string
+        securityVerdicts:
+          type: object
+          description: Parsed authentication-results verdicts (SPF, DKIM, DMARC).
+          properties:
+            spf:
+              type: string
+              enum: ["pass", "fail", "softfail", "none"]
+            dkim:
+              type: string
+              enum: ["pass", "fail", "none"]
+            dmarc:
+              type: string
+              enum: ["pass", "fail", "none"]
+        body:
+          type: string
+          description: Normalized email body. Max 1000 chars, URLs replaced by [LINK].
+          maxLength: 1000
+        truncated:
+          type: boolean
+          description: True if the body was truncated to fit the max length.
+        links:
+          type: array
+          description: Deduplicated list of URLs (http, https, mailto, data schemes) extracted from the raw email body.
+          maxItems: 50
+          items:
+            type: string
+            maxLength: 2048
+    ProcessResponse:
+      type: object
+      required:
+        - result
+        - comment
+      properties:
+        result:
+          type: string
+          enum: [OK, WARNING, PHISHING]
+          description: The phishing check verdict.
+        comment:
+          type: string
+          description: A human-readable message or comment regarding the verdict.
+          example: "This message is OK"
