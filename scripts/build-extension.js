@@ -5,16 +5,25 @@
  * using esbuild's programmatic API. Replaces the long inline
  * shell command that was previously in package.json.
  *
- * Each entry maps a source file to an output filename in dist/.
+ * Supports injecting build-time environment variables:
+ * - CHECKMAIL_API_BASE_URL (defaults to http://localhost:8080)
+ * - CHECKMAIL_API_KEY      (defaults to empty string)
+ *
+ * Automatically patches dist/manifest.json to ensure host_permissions
+ * include the target backend URL.
  */
 
 import * as esbuild from 'esbuild';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const root = resolve(__dirname, '..');
+
+const apiBaseUrl = process.env.CHECKMAIL_API_BASE_URL || 'http://localhost:8080';
+const apiKey = process.env.CHECKMAIL_API_KEY || '';
 
 /** Entry points: [source path relative to root] → [output filename in dist/] */
 const entries = [
@@ -38,6 +47,11 @@ const entries = [
 async function build() {
     const startTime = performance.now();
 
+    const define = {
+        'process.env.CHECKMAIL_API_BASE_URL': JSON.stringify(apiBaseUrl),
+        'process.env.CHECKMAIL_API_KEY': JSON.stringify(apiKey),
+    };
+
     const promises = entries.map(({ input, output }) =>
         esbuild.build({
             entryPoints: [resolve(root, input)],
@@ -45,13 +59,32 @@ async function build() {
             outfile: resolve(root, 'dist', output),
             format: 'iife',
             logLevel: 'warning',
+            define,
         })
     );
 
     await Promise.all(promises);
 
+    // Patch manifest.json in dist/ to ensure host_permissions includes apiBaseUrl
+    patchManifestHostPermissions(resolve(root, 'dist', 'manifest.json'));
+
     const elapsed = (performance.now() - startTime).toFixed(0);
-    console.log(`[build-extension] ✅ Built ${entries.length} bundles in ${elapsed}ms`);
+    console.log(`[build-extension] ✅ Built ${entries.length} bundles in ${elapsed}ms (API_BASE_URL: ${apiBaseUrl})`);
+}
+
+function patchManifestHostPermissions(manifestPath) {
+    if (!existsSync(manifestPath)) return;
+    try {
+        const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+        const hostPattern = apiBaseUrl.endsWith('/') ? `${apiBaseUrl}*` : `${apiBaseUrl}/*`;
+        if (Array.isArray(manifest.host_permissions) && !manifest.host_permissions.includes(hostPattern)) {
+            manifest.host_permissions.push(hostPattern);
+            writeFileSync(manifestPath, JSON.stringify(manifest, null, 4), 'utf8');
+            console.log(`[build-extension] 🔑 Added "${hostPattern}" to manifest host_permissions`);
+        }
+    } catch (err) {
+        console.warn('[build-extension] Warning: Could not patch manifest host_permissions:', err);
+    }
 }
 
 build().catch((err) => {

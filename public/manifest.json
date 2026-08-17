@@ -4,7 +4,7 @@
     "version": "0.1.0",
     "default_locale": "en",
     "description": "Phishing detection assistant — extracts email content from Gmail, Yahoo, Outlook, WP, Onet, and Interia for analysis.",
-    "permissions": [],
+    "permissions": ["storage"],
     "host_permissions": [
         "https://mail.google.com/*",
         "https://mail.yahoo.com/*",

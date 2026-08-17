@@ -1,19 +1,50 @@
 openapi: 3.0.3
 info:
   title: CheckMail Plugin Backend API
-  version: 1.0.0
+  version: 1.1.0
   description: >
-    API documentation for the CheckMail Plugin backend endpoint. 
-    This endpoint is used by the browser extension to verify email payloads for phishing.
+    API documentation for the CheckMail Plugin backend.
+    This API is used by the browser extension to obtain JWT access tokens
+    and to submit email payloads for phishing verification.
 servers:
   - url: http://localhost:8080
     description: Local development server
 paths:
-  /process.php:
+  /token:
+    post:
+      summary: Issue a JWT access token
+      description: >
+        Public token issuing endpoint. Does not require an existing JWT.
+        Returns a signed RS256 JWT that must be included in subsequent
+        requests to the /process endpoint.
+      operationId: issueToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRequest'
+      responses:
+        '200':
+          description: JWT issued successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Invalid token request (missing or malformed subject / expiresIn).
+        '429':
+          description: Token request rate limit exceeded.
+  /process:
     post:
       summary: Process an email for phishing check
-      description: Receives a `ProcessedEmailData` payload from the browser extension and returns a verdict (OK, WARNING, PHISHING).
+      description: >
+        Receives a `ProcessedEmailData` payload from the browser extension
+        and returns a verdict (OK, WARNING, PHISHING).
+        Requires a valid JWT in the Authorization header.
       operationId: processEmail
+      security:
+        - BearerAuth: []
       requestBody:
         description: The processed email data containing headers, security verdicts, and extracted links.
         required: true
@@ -29,11 +60,68 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProcessResponse'
         '400':
-          description: Invalid JSON payload.
+          description: Invalid JSON payload or schema validation error.
+        '401':
+          description: Missing or invalid JWT.
         '405':
           description: Method Not Allowed. Only POST is allowed.
+        '429':
+          description: Processing request rate limit exceeded.
 components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        JWT access token obtained from POST /token.
+        Include in the Authorization header as: Bearer <token>
   schemas:
+    TokenRequest:
+      type: object
+      required:
+        - subject
+      properties:
+        subject:
+          type: string
+          description: Unique client identifier (per-installation UUID).
+        expiresIn:
+          oneOf:
+            - type: integer
+              minimum: 1
+            - type: string
+          description: Optional token lifetime (seconds or duration string like "1h", "30m").
+      additionalProperties: false
+    TokenResponse:
+      type: object
+      required:
+        - audience
+        - expiresAt
+        - issuedAt
+        - issuer
+        - subject
+        - token
+        - tokenType
+      properties:
+        audience:
+          type: string
+        expiresAt:
+          type: integer
+          format: int64
+          description: Unix timestamp (seconds) when the token expires.
+        issuedAt:
+          type: integer
+          format: int64
+        issuer:
+          type: string
+        subject:
+          type: string
+        token:
+          type: string
+          description: The signed JWT string.
+        tokenType:
+          type: string
+          enum: [Bearer]
     ProcessedEmailData:
       type: object
       required:

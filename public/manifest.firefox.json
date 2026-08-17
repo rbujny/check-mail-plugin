@@ -3,7 +3,7 @@
     "name": "CheckMailPlugin",
     "version": "0.1.0",
     "description": "Phishing detection assistant — extracts email content from Gmail for analysis.",
-    "permissions": [],
+    "permissions": ["storage"],
     "host_permissions": [
         "https://mail.google.com/*",
         "https://outlook.live.com/*",
