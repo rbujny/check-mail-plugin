@@ -18,6 +18,10 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
   },
+  define: {
+    'process.env.CHECKMAIL_API_BASE_URL': JSON.stringify(process.env.CHECKMAIL_API_BASE_URL || 'http://localhost:8080'),
+    'process.env.CHECKMAIL_API_KEY': JSON.stringify(process.env.CHECKMAIL_API_KEY || ''),
+  },
   test: {
     environment: 'jsdom',
     globals: true,

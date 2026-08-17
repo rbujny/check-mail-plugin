@@ -9,9 +9,68 @@ Zgodnie z założeniami projektu wtyczka **nie** przesyła pełnych treści mail
 
 Z surowego maila usuwane są gigantyczne podpisy kryptograficzne (np. `DKIM-Signature`), a treść przechodzi sanitizację.
 
+## Autoryzacja (przepływ JWT)
+
+Komunikacja z backendem odbywa się w dwóch krokach z wykorzystaniem tokenów JWT:
+
+### Krok 1: Pobranie tokenu (`POST /token`)
+
+Przed wysłaniem maila do analizy, Service Worker wtyczki pobiera token JWT z publicznego endpointu `/token`:
+
+```http
+POST http://localhost:8080/token
+Content-Type: application/json
+
+{
+  "subject": "<per-installation-UUID>"
+}
+```
+
+Odpowiedź:
+```json
+{
+  "token": "eyJhbGciOiJSUzI1NiIs...",
+  "tokenType": "Bearer",
+  "expiresAt": 1755523200,
+  "issuedAt": 1755519600,
+  "issuer": "checkmail-backend",
+  "audience": "checkmail-clients",
+  "subject": "550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+- Pole `subject` zawiera unikalny UUID generowany per instalacja wtyczki i przechowywany w `chrome.storage.local`.
+- Token jest podpisany algorytmem RS256 po stronie backendu.
+- Domyślny czas życia tokenu to 1 godzina.
+
+### Krok 2: Wysłanie payloadu (`POST /process`)
+
+Zoptymalizowany payload maila jest wysyłany na chroniony endpoint `/process` z nagłówkiem autoryzacyjnym:
+
+```http
+POST http://localhost:8080/process
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJSUzI1NiIs...
+```
+
+### Keszowanie tokenu
+
+Token jest keszowany w pamięci Service Workera. Kolejne kliknięcia ikony skanowania **nie generują dodatkowych zapytań o token**, dopóki token nie zbliży się do wygaśnięcia (margines bezpieczeństwa: 60 sekund przed `expiresAt`).
+
+Jeśli backend odpowie kodem `401 Unauthorized`, Service Worker automatycznie:
+1. Unieważnia kesz tokenu
+2. Pobiera świeży token z `/token`
+3. Ponawia zapytanie do `/process`
+
+Ta operacja jest ograniczona do jednej próby na cykl skanowania, aby zapobiec nieskończonej pętli.
+
+### API Key (opcjonalny)
+
+W trybie produkcyjnym (z API Gateway) do URL-i dodawany jest parametr `?key=<API_KEY>` do celów atrybucji quoty. W trybie deweloperskim (bezpośrednio Cloud Functions) klucz nie jest wymagany.
+
 ## Struktura wysyłanego zapytania (POST)
 
-Zapytanie wysyłane jest metodą `POST` na adres `http://localhost:8080/process.php` z nagłówkiem `Content-Type: application/json`.
+Zapytanie wysyłane jest metodą `POST` na adres `http://localhost:8080/process` z nagłówkami `Content-Type: application/json` i `Authorization: Bearer <JWT>`.
 
 Oto dokładna struktura wysyłanego JSON-a (`ProcessedEmailData`):
 
@@ -59,7 +118,7 @@ Po przetworzeniu zrzuconego payloadu, backend musi zwrócić odpowiedź JSON, na
 
 ```json
 {
-  "result": "OK", // Możliwe wartości: "OK", "WARNING", "PHISHING"
+  "result": "OK",
   "comment": "Wiadomość pochodzi z zaufanego źródła i przeszła weryfikację."
 }
 ```

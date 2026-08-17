@@ -1,5 +1,7 @@
 /// <reference types="chrome" />
 import type { ProcessedEmailData } from '../shared/types';
+import { getValidToken, invalidateToken } from './auth-client';
+import { PROCESS_URL, withApiKey } from './api-config';
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'PROCESS_EMAIL' && message.payload) {
@@ -19,45 +21,67 @@ export async function processEmailPayload(payload: ProcessedEmailData, tabId: nu
     let attempt = 0;
     let success = false;
 
-    // T005: 3-attempt retry mechanism
-    while (attempt < maxRetries && !success) {
-        attempt++;
-        try {
-            // T004: Wire up AbortController with a 30-second timeout signal
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 30000);
+    // Guard: allow at most one token refresh per processEmailPayload
+    // call to prevent infinite loops when /token keeps returning
+    // a JWT that the backend immediately rejects as 401.
+    let tokenRefreshed = false;
 
-            // T003: Implement the base fetch POST request sending ProcessedEmailData
-            const response = await fetch('http://localhost:8080/process.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload),
-                signal: controller.signal
-            });
+    try {
+        // Obtain a valid JWT (cached or freshly issued)
+        let token = await getValidToken();
 
-            clearTimeout(timeoutId);
+        // T005: 3-attempt retry mechanism
+        while (attempt < maxRetries && !success) {
+            attempt++;
+            try {
+                // T004: Wire up AbortController with a 30-second timeout signal
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-            if (response.ok) {
-                const data = await response.json();
-                if (tabId) {
-                    chrome.tabs.sendMessage(tabId, {
-                        type: 'SHOW_SCAN_RESULT',
-                        payload: data
-                    });
+                // T003: Authorised POST request to the /process endpoint
+                const response = await fetch(withApiKey(PROCESS_URL), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (tabId) {
+                        chrome.tabs.sendMessage(tabId, {
+                            type: 'SHOW_SCAN_RESULT',
+                            payload: data
+                        });
+                    }
+                    success = true;
+                } else if (response.status === 401 && !tokenRefreshed) {
+                    // Token was rejected — clear cache, get a fresh one,
+                    // and retry this attempt (do not increment counter).
+                    console.warn('[CheckMailPlugin Background] 401 Unauthorized — refreshing token.');
+                    invalidateToken();
+                    token = await getValidToken();
+                    tokenRefreshed = true;
+                    attempt--; // do not count this as a retry attempt
+                } else {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                success = true;
-            } else {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-        } catch (error) {
-            console.error(`[CheckMailPlugin Background] Attempt ${attempt} failed:`, error);
-            if (attempt < maxRetries) {
-                // 1-second delay between attempts
-                await new Promise(resolve => setTimeout(resolve, 1000));
+            } catch (error) {
+                console.error(`[CheckMailPlugin Background] Attempt ${attempt} failed:`, error);
+                if (attempt < maxRetries) {
+                    // 1-second delay between attempts
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
             }
         }
+    } catch (error) {
+        // Token acquisition itself failed
+        console.error('[CheckMailPlugin Background] Token acquisition failed:', error);
     }
 
     if (tabId) {
