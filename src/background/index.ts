@@ -26,6 +26,8 @@ export async function processEmailPayload(payload: ProcessedEmailData, tabId: nu
     // a JWT that the backend immediately rejects as 401.
     let tokenRefreshed = false;
 
+    let lastError: string | null = null;
+
     try {
         // Obtain a valid JWT (cached or freshly issued)
         let token = await getValidToken();
@@ -69,9 +71,11 @@ export async function processEmailPayload(payload: ProcessedEmailData, tabId: nu
                     tokenRefreshed = true;
                     attempt--; // do not count this as a retry attempt
                 } else {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorText = await response.text().catch(() => '');
+                    throw new Error(`HTTP ${response.status}: ${errorText || response.statusText}`);
                 }
             } catch (error) {
+                lastError = error instanceof Error ? error.message : String(error);
                 console.error(`[CheckMailPlugin Background] Attempt ${attempt} failed:`, error);
                 if (attempt < maxRetries) {
                     // 1-second delay between attempts
@@ -81,6 +85,7 @@ export async function processEmailPayload(payload: ProcessedEmailData, tabId: nu
         }
     } catch (error) {
         // Token acquisition itself failed
+        lastError = error instanceof Error ? error.message : String(error);
         console.error('[CheckMailPlugin Background] Token acquisition failed:', error);
     }
 
@@ -91,9 +96,12 @@ export async function processEmailPayload(payload: ProcessedEmailData, tabId: nu
 
     // T008: Send a failure message back to the active tab's content script upon exhaustion of retries
     if (!success && tabId) {
+        const errorMsg = lastError
+            ? `Transmission failed: ${lastError}`
+            : 'Data transmission failed. Request could not be handled.';
         chrome.tabs.sendMessage(tabId, {
             type: 'SHOW_TOAST_ERROR',
-            message: 'Data transmission failed. Request could not be handled.'
+            message: errorMsg
         });
     }
 }
