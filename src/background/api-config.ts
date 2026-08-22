@@ -14,10 +14,7 @@
  * In CI/CD (GitHub Actions) or production builds, inject via the
  * CHECKMAIL_API_BASE_URL environment variable / GitHub Variable.
  */
-export const API_BASE_URL =
-    (typeof process !== 'undefined' && process.env?.CHECKMAIL_API_BASE_URL)
-        ? process.env.CHECKMAIL_API_BASE_URL
-        : 'http://localhost:8080';
+export const API_BASE_URL = process.env.CHECKMAIL_API_BASE_URL || 'http://localhost:8080';
 
 /** Token issuing endpoint (public — no JWT required). */
 export const TOKEN_URL = `${API_BASE_URL}/token`;
@@ -38,10 +35,7 @@ export const TOKEN_EXPIRY_MARGIN_SECONDS = 60;
  * In CI/CD (GitHub Actions), inject via the CHECKMAIL_API_KEY
  * environment variable / GitHub Secret.
  */
-export const API_KEY =
-    (typeof process !== 'undefined' && process.env?.CHECKMAIL_API_KEY)
-        ? process.env.CHECKMAIL_API_KEY
-        : '';
+export const API_KEY = process.env.CHECKMAIL_API_KEY || '';
 
 /**
  * Returns the given URL with the API key query parameter appended

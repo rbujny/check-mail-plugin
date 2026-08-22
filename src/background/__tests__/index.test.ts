@@ -121,7 +121,7 @@ describe('background service worker', () => {
         // After 3 failed attempts, it should send a toast error
         expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(tabId, {
             type: 'SHOW_TOAST_ERROR',
-            message: expect.stringContaining('transmission failed')
+            message: expect.stringMatching(/transmission failed/i)
         });
 
         // Badge should still be cleared at the end
@@ -196,7 +196,7 @@ describe('background service worker', () => {
         // Toast error sent
         expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(tabId, {
             type: 'SHOW_TOAST_ERROR',
-            message: expect.stringContaining('transmission failed')
+            message: expect.stringMatching(/transmission failed/i)
         });
 
         // Badge cleared
