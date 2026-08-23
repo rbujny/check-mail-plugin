@@ -2,13 +2,21 @@
     "manifest_version": 3,
     "name": "CheckMailPlugin",
     "version": "0.1.0",
-    "description": "Phishing detection assistant — extracts email content from Gmail for analysis.",
-    "permissions": ["storage"],
+    "default_locale": "en",
+    "description": "Phishing detection assistant — extracts email content from Gmail, Yahoo, Outlook, WP, Onet, and Interia for analysis.",
+    "permissions": [
+        "storage"
+    ],
     "host_permissions": [
         "https://mail.google.com/*",
+        "https://mail.yahoo.com/*",
+        "https://apis.mail.yahoo.com/*",
         "https://outlook.live.com/*",
         "https://outlook.office.com/*",
         "https://outlook.office365.com/*",
+        "https://poczta.wp.pl/*",
+        "https://poczta.onet.pl/*",
+        "https://poczta.interia.pl/*",
         "http://localhost:8080/*",
         "http://127.0.0.1:8080/*"
     ],
@@ -33,12 +41,49 @@
         },
         {
             "matches": [
+                "https://mail.yahoo.com/*",
+                "https://apis.mail.yahoo.com/*"
+            ],
+            "js": [
+                "yahoo-content.js"
+            ],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
                 "https://outlook.live.com/*",
                 "https://outlook.office.com/*",
                 "https://outlook.office365.com/*"
             ],
             "js": [
                 "outlook-content.js"
+            ],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "https://poczta.wp.pl/*"
+            ],
+            "js": [
+                "wp-content.js"
+            ],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "https://poczta.onet.pl/*"
+            ],
+            "js": [
+                "onet-content.js"
+            ],
+            "run_at": "document_idle"
+        },
+        {
+            "matches": [
+                "https://poczta.interia.pl/*"
+            ],
+            "js": [
+                "interia-content.js"
             ],
             "run_at": "document_idle"
         }
