@@ -1,25 +1,9 @@
-/**
- * Interia Mail (poczta.interia.pl) email content extractor.
- *
- * Extracts simplified email data from the Interia Mail standard message view
- * and raw MIME text from the "Pokaż nagłówki" / "Źródło wiadomości" view.
- */
 
 import type { EmailData, ExtractionResult } from '../../types/email';
 
-/**
- * Extract email content from the Interia Mail standard message view.
- *
- * Interia Mail renders emails in a reading pane with toolbar buttons above.
- * Selectors target Interia's data attributes and semantic class names.
- *
- * @param container - The DOM element containing the email message.
- * @returns An ExtractionResult with simplified EmailData.
- */
 export function extractInteriaEmailContent(container: HTMLElement): ExtractionResult {
     const warnings: string[] = [];
 
-    // Interia Mail DOM selectors — subject, sender, recipients, body, date
     const subjectEl =
         container.querySelector<HTMLElement>('h1.message-header__subject') ||
         container.querySelector<HTMLElement>('[data-qa="message-subject"]') ||
@@ -37,7 +21,6 @@ export function extractInteriaEmailContent(container: HTMLElement): ExtractionRe
         container.querySelector<HTMLElement>('[data-qa="message-to"]') ||
         container.querySelector<HTMLElement>('.recipient-list');
 
-    // Interia renders the email payload in an about:blank iframe
     const iframe = container.querySelector<HTMLIFrameElement>('iframe.message__iframe') ||
                    container.querySelector<HTMLIFrameElement>('iframe.message-iframe');
 
@@ -55,7 +38,6 @@ export function extractInteriaEmailContent(container: HTMLElement): ExtractionRe
 
     const subject = subjectEl?.textContent?.trim() || '';
     
-    // Attempt to get the dedicated email element first, then fallback to name/title
     const from = fromMailEl?.textContent?.trim() ||
                  fromEl?.getAttribute('title') || 
                  fromEl?.textContent?.trim() || '';
@@ -92,30 +74,16 @@ export function extractInteriaEmailContent(container: HTMLElement): ExtractionRe
     };
 }
 
-/**
- * Extract raw email source from Interia's "Pokaż nagłówki" / "Źródło wiadomości" view.
- *
- * The raw view typically renders the full MIME payload in a <pre>
- * or a dedicated source container.
- *
- * @returns The raw text content of the email, or empty string if not found.
- */
 export function extractInteriaRawContent(): string {
     const pre = document.querySelector<HTMLElement>('pre');
     if (pre) return pre.textContent || '';
 
-    // Fallback: look for a dedicated source container
     const sourceContainer =
         document.querySelector<HTMLElement>('.source-view') ||
         document.querySelector<HTMLElement>('[data-qa="message-source"]');
     return sourceContainer?.textContent || '';
 }
 
-/**
- * Extracts parsed raw headers from the Interia details table if it is visible.
- *
- * @returns A dictionary of raw headers, or null if the table is not found.
- */
 export function extractInteriaDetailsTable(): Record<string, string | string[]> | null {
     const table = document.querySelector<HTMLElement>('table.message__details__table');
     if (!table) return null;

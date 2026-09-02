@@ -1,13 +1,7 @@
-/**
- * Content script entry point for Outlook Web.
- */
 
 import { injectOutlookStandardIcon, injectOutlookRawIcon } from './outlook-injector';
 import { setupMessageListener } from '../shared/toast';
 
-/**
- * Debounce utility.
- */
 function debounce(fn: () => void, delayMs: number): () => void {
     let timer: ReturnType<typeof setTimeout> | null = null;
     return () => {
@@ -16,12 +10,8 @@ function debounce(fn: () => void, delayMs: number): () => void {
     };
 }
 
-/**
- * Process the current Outlook view.
- */
 function processOutlookView(): void {
     try {
-        // Handle both standard view and raw source view
         injectOutlookStandardIcon();
         injectOutlookRawIcon();
     } catch (error) {
@@ -31,18 +21,13 @@ function processOutlookView(): void {
 
 const debouncedProcess = debounce(processOutlookView, 300);
 
-/**
- * Initialize the Outlook content script.
- */
 function init(): void {
     console.log('[CheckMailPlugin] Outlook content script loaded.');
 
     setupMessageListener();
 
-    // Initial scan
     processOutlookView();
 
-    // Observe for Outlook SPA navigation and dynamic content
     const observer = new MutationObserver(() => {
         debouncedProcess();
     });
@@ -53,7 +38,6 @@ function init(): void {
     });
 }
 
-// Wait for DOM to be ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {

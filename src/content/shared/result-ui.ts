@@ -1,7 +1,3 @@
-/**
- * UI Component for displaying Scan Results across all webmail clients.
- * Uses Shadow DOM to isolate styles from aggressive global CSS injected by providers.
- */
 
 export interface ScanResultPayload {
     result: 'OK' | 'WARNING' | 'PHISHING' | string;
@@ -44,7 +40,6 @@ const THEMES = {
 };
 
 function injectStyles(result: 'OK' | 'WARNING' | 'PHISHING'): string {
-    // Only PHISHING is an aggressive center modal now. WARNING is a sticky toast.
     const isModal = result === 'PHISHING';
 
     return `
@@ -193,22 +188,18 @@ function injectStyles(result: 'OK' | 'WARNING' | 'PHISHING'): string {
 }
 
 export function showScanResult(payload: ScanResultPayload): void {
-    // Determine tier, fallback to WARNING if unknown
     const tier = THEMES[payload.result as keyof typeof THEMES] ? payload.result : 'WARNING';
     const theme = THEMES[tier as keyof typeof THEMES];
     const iconStr = ICONS[tier as keyof typeof ICONS];
 
-    // Cleanup any existing active overlays to avoid stacking
     const existing = document.getElementById(UI_CONTAINER_ID);
     if (existing) existing.remove();
 
     const hostWrap = document.createElement('div');
     hostWrap.id = UI_CONTAINER_ID;
 
-    // Attach Shadow DOM 
     const shadow = hostWrap.attachShadow({ mode: 'closed' });
 
-    // Inject CSS variables directly into shadow root
     const rootBlock = document.createElement('div');
     rootBlock.className = 'wrapper';
     rootBlock.style.setProperty('--theme-bg', theme.bg);
@@ -219,7 +210,6 @@ export function showScanResult(payload: ScanResultPayload): void {
 
     const isModal = tier === 'PHISHING';
 
-    // Build HTML template
     rootBlock.innerHTML = `
         ${injectStyles(tier as 'OK' | 'WARNING' | 'PHISHING')}
         <div class="backdrop"></div>
@@ -252,7 +242,6 @@ export function showScanResult(payload: ScanResultPayload): void {
     shadow.appendChild(rootBlock);
     document.body.appendChild(hostWrap);
 
-    // Event binding and teardown logic
     const card = shadow.querySelector('#result-card') as HTMLElement;
     const backdrop = shadow.querySelector('.backdrop');
 
@@ -262,7 +251,6 @@ export function showScanResult(payload: ScanResultPayload): void {
         if (backdrop) {
             (backdrop as HTMLElement).style.animation = 'fadeIn 0.2s ease-in reverse forwards';
         }
-        // Wait for animation to end
         setTimeout(() => hostWrap.remove(), 350);
     };
 
@@ -273,7 +261,6 @@ export function showScanResult(payload: ScanResultPayload): void {
         const closeBtn = shadow.querySelector('#close-btn');
         if (closeBtn) closeBtn.addEventListener('click', dismiss);
 
-        // Auto-dismiss ONLY if it's OK. WARNING stays on screen until dismissed by user.
         if (tier === 'OK') {
             setTimeout(() => {
                 if (hostWrap.parentNode) dismiss();

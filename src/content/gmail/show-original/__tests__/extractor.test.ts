@@ -44,17 +44,14 @@ describe('parseMimeData', () => {
 
 describe('extractOriginalContent', () => {
     beforeEach(() => {
-        // Clear DOM
         document.body.innerHTML = '';
     });
 
     it('should extract data purely from the raw MIME text block', () => {
-        // Mock DOM imitating Gmail's "Show Original" structure
         const container = document.createElement('div');
         const rawTextDiv = document.createElement('div');
         rawTextDiv.className = 'raw_message_text';
 
-        // JSDOM doesn't support innerText, so we mock it specifically for this element
         const rawString = `From: alice@example.com
 To: bob@example.com
 Subject: Hello World
@@ -78,11 +75,9 @@ This is the raw body.`;
         expect(result.data.from).toBe('alice@example.com');
         expect(result.data.to).toEqual(['bob@example.com']);
         expect(result.data.subject).toBe('Hello World');
-        // Extract raw body
         const extendedData = result.data as any;
         expect(extendedData.rawBody).toContain('This is the raw body.');
 
-        // Assert raw headers parsed
         expect(extendedData.headers['authentication-results']).toBe('mx.google.com; spf=pass');
     });
 
@@ -108,7 +103,6 @@ Body`;
         const result = extractOriginalContent();
         const extendedData = result.data as any;
 
-        // Ensure missing headers are either caught by success=false or populated correctly from raw
         expect(result.success).toBe(true);
         expect(extendedData.headers['from']).toBe('alice@example.com');
         expect(extendedData.headers['to']).toBe('bob@example.com');
@@ -126,7 +120,6 @@ Body`;
 
         expect(result.success).toBe(false);
         expect(result.warnings.length).toBeGreaterThan(0);
-        // Fallback checks
         expect(result.data.from).toBe('[extraction failed]');
     });
 });

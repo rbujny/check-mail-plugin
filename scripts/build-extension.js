@@ -1,17 +1,3 @@
-/**
- * build-extension.js
- *
- * Builds all content scripts and the background service worker
- * using esbuild's programmatic API. Replaces the long inline
- * shell command that was previously in package.json.
- *
- * Supports injecting build-time environment variables:
- * - CHECKMAIL_API_BASE_URL (defaults to http://localhost:8080)
- * - CHECKMAIL_API_KEY      (defaults to empty string)
- *
- * Automatically patches dist/manifest.json to ensure host_permissions
- * include the target backend URL.
- */
 
 import * as esbuild from 'esbuild';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
@@ -25,22 +11,14 @@ const root = resolve(__dirname, '..');
 const apiBaseUrl = process.env.CHECKMAIL_API_BASE_URL || 'http://localhost:8080';
 const apiKey = process.env.CHECKMAIL_API_KEY || '';
 
-/** Entry points: [source path relative to root] → [output filename in dist/] */
 const entries = [
-    // Gmail
     { input: 'src/content/gmail/index.ts', output: 'gmail-content.js' },
     { input: 'src/content/gmail/show-original/index.ts', output: 'gmail-show-original-content.js' },
-    // Yahoo
     { input: 'src/content/yahoo/index.ts', output: 'yahoo-content.js' },
-    // Outlook
     { input: 'src/content/outlook/index.ts', output: 'outlook-content.js' },
-    // WP
     { input: 'src/content/wp/index.ts', output: 'wp-content.js' },
-    // Onet
     { input: 'src/content/onet/index.ts', output: 'onet-content.js' },
-    // Interia
     { input: 'src/content/interia/index.ts', output: 'interia-content.js' },
-    // Background service worker
     { input: 'src/background/index.ts', output: 'service-worker.js' },
 ];
 
@@ -65,7 +43,6 @@ async function build() {
 
     await Promise.all(promises);
 
-    // Patch manifest.json in dist/ to ensure host_permissions includes apiBaseUrl
     patchManifestHostPermissions(resolve(root, 'dist', 'manifest.json'));
 
     const elapsed = (performance.now() - startTime).toFixed(0);

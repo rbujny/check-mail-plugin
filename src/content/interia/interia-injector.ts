@@ -1,14 +1,3 @@
-/**
- * Interia Mail icon injection module for CheckMailPlugin.
- *
- * Responsible for:
- * - Locating the Interia Mail toolbar in standard message view
- * - Injecting the CheckMailPlugin shield icon
- * - Providing a floating overlay button on the raw source view
- * - Handling click events with dataset.extracting debounce lock (FR-006)
- * - Brief visual loading state via icon color change (FR-007)
- * - Graceful failure on DOM mismatch (silent console error, never breaks native UI)
- */
 
 import { extractInteriaEmailContent, extractInteriaRawContent, extractInteriaDetailsTable } from './interia-extractor';
 import { ICON_MARKER, SHIELD_ICON_SVG } from '../gmail/icon-injector';
@@ -16,27 +5,16 @@ import { optimizeEmailData } from '../shared/email-data-optimizer';
 import { extractBodyFromMime } from '../../utils/mime-parser';
 import { decodeQuotedPrintable } from '../../utils/sanitizer';
 
-/** Size threshold for payload warning (5 MB) */
 const SIZE_WARNING_THRESHOLD = 5 * 1024 * 1024;
 
-// ─── Standard View ──────────────────────────────────────────────────
-
-/**
- * Finds all instances of the Interia Mail message action toolbars.
- * Interia can have standard and sticky toolbars simultaneously.
- */
 function findInteriaToolbars(): HTMLElement[] {
     return Array.from(document.querySelectorAll<HTMLElement>('ul.message__toolbar__actions'));
 }
 
-/**
- * Creates the shield button wrapper for the standard Interia Mail view.
- */
 function createStandardShieldButton(): HTMLLIElement {
     const li = document.createElement('li');
     li.className = 'message__toolbar__actions__item';
     li.setAttribute(ICON_MARKER, 'wrapper');
-    // Ensure inline display so it doesn't break the row and create a column!
     li.style.display = 'inline-flex';
     li.style.alignItems = 'center';
     li.style.marginRight = '8px';
@@ -46,7 +24,6 @@ function createStandardShieldButton(): HTMLLIElement {
     button.setAttribute('title', chrome.i18n.getMessage("scanButtonText"));
     button.setAttribute('aria-label', chrome.i18n.getMessage("scanButtonText"));
     
-    // Add text label and standard text button styling
     button.innerHTML = `
         <span style="display: flex; align-items: center; justify-content: center; width: 16px; height: 16px;">
             ${SHIELD_ICON_SVG}
@@ -86,14 +63,12 @@ function createStandardShieldButton(): HTMLLIElement {
         }
     });
 
-    // Click handler with dataset.extracting debounce lock (FR-006)
     button.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (button.dataset.extracting) return; // Debounce lock (FR-006)
+        if (button.dataset.extracting) return;
 
-        // Brief visual loading state — icon color change (FR-007)
         button.dataset.extracting = 'true';
         button.style.opacity = '1';
         button.style.color = '#1a73e8';
@@ -108,19 +83,14 @@ function createStandardShieldButton(): HTMLLIElement {
                 'Date': result.data.date,
             };
 
-            // If user opened "Szczegóły wiadomości", extract detailed raw headers
             const detailsTable = extractInteriaDetailsTable();
             if (detailsTable) {
-                // Selectively merge headers to avoid replacing clean UI Subject/From 
-                // with raw MIME encoded strings
                 if (detailsTable['X-Envelope-From']) {
                     rawHeaders['Return-Path'] = detailsTable['X-Envelope-From'];
                 }
                 if (detailsTable['Reply-To']) {
                     rawHeaders['Reply-To'] = detailsTable['Reply-To'];
                 }
-                // We do NOT spread all detailsTable headers into rawHeaders
-                // because it breaks parsing if it contains MIME encoded subject.
             }
 
             const payload = optimizeEmailData(rawHeaders, result.data.bodyText);
@@ -131,9 +101,9 @@ function createStandardShieldButton(): HTMLLIElement {
 
             chrome.runtime.sendMessage({ type: 'PROCESS_EMAIL', payload });
 
-            button.style.color = '#34a853'; // success
+            button.style.color = '#34a853';
         } catch (error) {
-            button.style.color = '#ea4335'; // error
+            button.style.color = '#ea4335';
             console.error('[CheckMailPlugin][Interia] Extraction failed:', error);
         } finally {
             setTimeout(() => {
@@ -148,22 +118,17 @@ function createStandardShieldButton(): HTMLLIElement {
     return li;
 }
 
-/**
- * Inject the shield icon into the Interia Mail standard view toolbar.
- */
 export function injectInteriaStandardIcon(): void {
     try {
         const toolbars = findInteriaToolbars();
         
         for (const toolbar of toolbars) {
-            // Already injected in this toolbar?
             if (toolbar.querySelector(`[${ICON_MARKER}]`)) {
                 continue;
             }
             
             const liBlock = createStandardShieldButton();
             
-            // Try to place it to the left of the star icon (as the first element)
             let starLi: HTMLElement | null = null;
             for (const child of Array.from(toolbar.children)) {
                if (child.querySelector('.icon-star')) {
@@ -172,7 +137,6 @@ export function injectInteriaStandardIcon(): void {
                }
             }
             
-            // Insert as first child or before star
             toolbar.insertBefore(liBlock, starLi || toolbar.firstChild);
         }
     } catch (error) {
@@ -180,11 +144,6 @@ export function injectInteriaStandardIcon(): void {
     }
 }
 
-// ─── Raw View ("Pokaż nagłówki" / "Źródło wiadomości") ─────────────
-
-/**
- * Creates a floating overlay button for the raw email source view.
- */
 function createRawShieldButton(): HTMLButtonElement {
     const button = document.createElement('button');
     button.setAttribute(ICON_MARKER, 'true');
@@ -225,21 +184,18 @@ function createRawShieldButton(): HTMLButtonElement {
         }
     });
 
-    // Click handler with dataset.extracting debounce lock (FR-006)
     button.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (button.dataset.extracting) return; // Debounce lock (FR-006)
+        if (button.dataset.extracting) return;
 
-        // Brief visual loading state — icon color change (FR-007)
         button.dataset.extracting = 'true';
         button.style.background = '#ffa000';
 
         try {
             const rawText = extractInteriaRawContent();
 
-            // 5 MB threshold warning
             const rawSize = new Blob([rawText]).size;
             if (rawSize > SIZE_WARNING_THRESHOLD) {
                 console.warn(
@@ -250,7 +206,6 @@ function createRawShieldButton(): HTMLButtonElement {
             const extractedPart = extractBodyFromMime(rawText);
             const decodedBody = decodeQuotedPrintable(extractedPart);
 
-            // Parse raw headers from MIME payload
             const rawHeaders: Record<string, string | string[]> = {};
             const headerEndIndex = rawText.indexOf('\r\n\r\n') !== -1
                 ? rawText.indexOf('\r\n\r\n')
@@ -282,9 +237,9 @@ function createRawShieldButton(): HTMLButtonElement {
             const payload = optimizeEmailData(rawHeaders, decodedBody);
             chrome.runtime.sendMessage({ type: 'PROCESS_EMAIL', payload });
 
-            button.style.background = '#34a853'; // success
+            button.style.background = '#34a853';
         } catch (error) {
-            button.style.background = '#ea4335'; // error
+            button.style.background = '#ea4335';
             console.error('[CheckMailPlugin][Interia] Raw extraction failed:', error);
         } finally {
             setTimeout(() => {
@@ -297,9 +252,6 @@ function createRawShieldButton(): HTMLButtonElement {
     return button;
 }
 
-/**
- * Inject a floating extraction button in the Interia raw source view.
- */
 export function injectInteriaRawIcon(): void {
     if (document.querySelector(`[${ICON_MARKER}]`)) {
         return;

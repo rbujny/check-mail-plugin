@@ -1,19 +1,3 @@
-/**
- * Tests for the email-data-optimizer module.
- *
- * Covers:
- * - T006/T007: Header filtering + security verdict parsing
- * - T010/T011: URL extraction/dedup + whitespace normalization + truncation
- * - T012-T015: Edge cases (malformed auth, body all URLs, multi-line URLs, missing headers)
- * - T019: Payload size reduction benchmark (SC-001)
- * - T020: Performance benchmark (SC-004)
- *
- * Security fixes validated:
- * - Fix #1: Duplicate header accumulation (Received chain via string[])
- * - Fix #2: Case-insensitive auth-results extraction (single-pass in loop)
- * - Fix #3: Return-Path in allowed headers
- * - Fix #4: Truncation marker + mailto:/data: URL scheme coverage
- */
 
 import { describe, it, expect } from 'vitest';
 import {
@@ -23,12 +7,7 @@ import {
     optimizeEmailData,
 } from '../email-data-optimizer';
 
-// ============================================================
-// Phase 2 — US1: Secure Header Processing
-// ============================================================
-
 describe('optimizeHeaders', () => {
-    // T006: Header filtering and verification of discarded signatures
     it('should retain only allowed targeting headers (to, from, subject, reply-to, return-path)', () => {
         const raw: Record<string, string | string[]> = {
             'From': 'alice@example.com',
@@ -88,7 +67,6 @@ describe('optimizeHeaders', () => {
         expect(headers).toHaveProperty('subject');
     });
 
-    // Fix #1: Duplicate header support
     it('should accumulate multiple Received headers from string[] input', () => {
         const raw: Record<string, string | string[]> = {
             'From': 'alice@example.com',
@@ -120,7 +98,6 @@ describe('optimizeHeaders', () => {
         expect(receivedChain[0]).toContain('mx1.example.com');
     });
 
-    // Fix #2: Case-insensitive authentication-results extraction
     it('should extract authentication-results regardless of casing', () => {
         const raw: Record<string, string | string[]> = {
             'From': 'alice@example.com',
@@ -132,7 +109,6 @@ describe('optimizeHeaders', () => {
         expect(authResultsRaw).toContain('spf=pass');
     });
 
-    // Fix #3: Return-Path retained
     it('should retain Return-Path for spoofing detection', () => {
         const raw: Record<string, string | string[]> = {
             'From': 'display@legit.com',
@@ -143,7 +119,6 @@ describe('optimizeHeaders', () => {
 
         expect(headers['return-path']).toBe('<actual-sender@suspicious.com>');
     });
-    // Fix 5: Header Smuggling protections
     it('should concatenate duplicate targeting headers instead of overwriting (Header Smuggling)', () => {
         const raw: Record<string, string | string[]> = {
             'From': 'alice@example.com',
@@ -152,11 +127,9 @@ describe('optimizeHeaders', () => {
 
         const { headers } = optimizeHeaders(raw);
 
-        // Uses a pipe delimiter to expose the discrepancy to the LLM
         expect(headers['subject']).toBe('Innocent Subject | URGENT: WINNER WINNER CHICKEN DINNER');
     });
 
-    // Fix 6: Multiple Auth-Results
     it('should properly merge multiple distinct Authentication-Results headers', () => {
         const raw: Record<string, string | string[]> = {
             'From': 'alice@example.com',
@@ -169,18 +142,14 @@ describe('optimizeHeaders', () => {
         const { authResultsRaw } = optimizeHeaders(raw);
         const verdicts = parseSecurityVerdicts(authResultsRaw);
 
-        // In a properly concatenated result, string replacement/matching might yield the right things,
-        // but at least both headers are preserved physically in authResultsRaw:
         expect(authResultsRaw).toContain('mx1.spam.com; dkim=fail');
         expect(authResultsRaw).toContain('mx2.google.com; spf=pass; dkim=pass; dmarc=none');
 
-        // Ensure parsing still works across the merged string
         expect(verdicts.spf).toBe('pass');
     });
 });
 
 describe('parseSecurityVerdicts', () => {
-    // T007: Accurate SPF, DKIM, DMARC verdict parsing
     it('should parse SPF, DKIM, and DMARC verdicts from authentication-results', () => {
         const authResults =
             'mx.google.com; dkim=pass header.i=@example.com; spf=pass (google.com: domain); dmarc=pass';
@@ -220,12 +189,7 @@ describe('parseSecurityVerdicts', () => {
     });
 });
 
-// ============================================================
-// Phase 3 — US2: Minimalist Body Text Extraction
-// ============================================================
-
 describe('optimizeBody', () => {
-    // T010: URL extraction and deduplication
     it('should extract http and https URLs from body text', () => {
         const body =
             'Visit https://example.com for info, or check http://test.org/page for more.';
@@ -257,7 +221,6 @@ describe('optimizeBody', () => {
         expect(processed).toContain('[LINK]');
     });
 
-    // Fix #4: mailto: and data: URL scheme coverage
     it('should extract mailto: links used for phishing reply vectors', () => {
         const body =
             'Reply to mailto:phisher@evil.com or click https://safe.com for help.';
@@ -279,7 +242,6 @@ describe('optimizeBody', () => {
         expect(links[0]).toContain('data:text/html;base64,');
     });
 
-    // T011: Whitespace normalization and 1000-char truncation
     it('should normalize whitespace (multiple spaces, newlines, tabs)', () => {
         const body = 'Hello   world.\n\n\nThis   is\t\ta   test.';
 
@@ -315,9 +277,7 @@ describe('optimizeBody', () => {
         expect(truncated).toBe(false);
     });
 
-    // Fix 7: Cap URLs to 50
     it('should cap the list of extracted URLs to 50 to prevent payload DoS attacks', () => {
-        // Build a body containing 60 distinct URLs
         let largeBody = '';
         for (let i = 0; i < 60; i++) {
             largeBody += `https://example.com/page${i} `;
@@ -326,30 +286,22 @@ describe('optimizeBody', () => {
         const { links, truncated } = optimizeBody(largeBody);
 
         expect(links).toHaveLength(50);
-        // Ensure the last generated URL didn't make the cut
         expect(links).not.toContain('https://example.com/page59');
-        // We replaced 60 URLs with short [LINK] placeholders, so text is < 1000 chars and NOT truncated
         expect(truncated).toBe(false);
     });
 
-    // Fix 8: Cap individual URL length
     it('should cap extremely long URLs to 2048 characters to prevent URL-stuffing DoS', () => {
         const giantUrl = 'https://example.com/' + 'A'.repeat(5000);
         const { links, truncated } = optimizeBody('Click ' + giantUrl);
 
         expect(links).toHaveLength(1);
-        expect(links[0].length).toBe(2048 + 3); // 2048 chars + '...'
+        expect(links[0].length).toBe(2048 + 3);
         expect(links[0].endsWith('...')).toBe(true);
-        expect(truncated).toBe(false); // body text with [LINK] placeholder is short
+        expect(truncated).toBe(false);
     });
 });
 
-// ============================================================
-// Phase 4 — Edge Cases
-// ============================================================
-
 describe('Edge Cases', () => {
-    // T012: Malformed or partial authentication-results header
     it('should handle auth-results with only SPF (no DKIM or DMARC)', () => {
         const authResults = 'mx.google.com; spf=pass';
 
@@ -365,11 +317,9 @@ describe('Edge Cases', () => {
 
         const verdicts = parseSecurityVerdicts(authResults);
 
-        // Should not throw, just return empty or partial
         expect(verdicts).toBeDefined();
     });
 
-    // T013: Email body composed entirely of URLs
     it('should handle body composed entirely of URLs', () => {
         const body =
             'https://example.com https://test.org http://another.com/path';
@@ -380,7 +330,6 @@ describe('Edge Cases', () => {
         expect(processed).toBe('[LINK] [LINK] [LINK]');
     });
 
-    // T014: Malformed or multi-line URLs
     it('should handle URLs that stop at common delimiters', () => {
         const body = 'Check <https://example.com> for info.';
 
@@ -399,7 +348,6 @@ describe('Edge Cases', () => {
         expect(links[0]).toBe('https://example.com/path');
     });
 
-    // T015: Missing targeting headers (e.g., no Reply-To or no To field)
     it('should handle missing Reply-To header gracefully', () => {
         const raw: Record<string, string | string[]> = {
             'From': 'alice@example.com',
@@ -436,10 +384,6 @@ describe('Edge Cases', () => {
         expect(authResultsRaw).toBe('');
     });
 });
-
-// ============================================================
-// Phase 5 — Integration & Validation
-// ============================================================
 
 describe('optimizeEmailData (integration)', () => {
     const sampleHeaders: Record<string, string | string[]> = {
@@ -483,7 +427,6 @@ describe('optimizeEmailData (integration)', () => {
     it('should produce a complete ProcessedEmailData object', () => {
         const result = optimizeEmailData(sampleHeaders, sampleBody);
 
-        // Headers: only targeting headers kept (including return-path)
         expect(result.headers).toHaveProperty('from', 'attacker@phish.com');
         expect(result.headers).toHaveProperty('to', 'victim@company.com');
         expect(result.headers).toHaveProperty('subject', 'Urgent: Verify your account');
@@ -496,29 +439,23 @@ describe('optimizeEmailData (integration)', () => {
         expect(result.headers).not.toHaveProperty('x-spam-status');
         expect(result.headers).not.toHaveProperty('content-type');
 
-        // Received chain: all 3 hops preserved
         expect(result.receivedChain).toHaveLength(3);
 
-        // Security verdicts
         expect(result.securityVerdicts.spf).toBe('fail');
         expect(result.securityVerdicts.dkim).toBe('pass');
         expect(result.securityVerdicts.dmarc).toBe('fail');
 
-        // Body: URLs replaced, whitespace normalized
         expect(result.body).toContain('[LINK]');
         expect(result.body).not.toContain('https://phish.com');
         expect(result.body).not.toContain('mailto:');
         expect(result.body.length).toBeLessThanOrEqual(1000);
 
-        // Links: extracted and deduplicated — including mailto: scheme
         expect(result.links).toContain('https://phish.com/reset');
         expect(result.links).toContain('https://phish.com/verify');
         expect(result.links).toContain('mailto:support@phish.com');
-        // https://phish.com/reset appears twice but should be deduplicated
         expect(result.links.filter(l => l === 'https://phish.com/reset')).toHaveLength(1);
     });
 
-    // Fix #2 validation: case-insensitive auth-results extraction
     it('should extract auth-results regardless of header key casing', () => {
         const mixedCaseHeaders: Record<string, string | string[]> = {
             'From': 'test@example.com',
@@ -532,7 +469,6 @@ describe('optimizeEmailData (integration)', () => {
         expect(result.securityVerdicts.dmarc).toBe('none');
     });
 
-    // Fix #4 validation: truncation marker
     it('should append [TRUNCATED] marker when body exceeds 1000 chars', () => {
         const longBody = 'Word '.repeat(500);
 
@@ -550,7 +486,6 @@ describe('optimizeEmailData (integration)', () => {
         expect(result.body).not.toContain('[TRUNCATED]');
     });
 
-    // T019: Payload size reduction benchmark (SC-001)
     it('should reduce payload size by at least 50% compared to raw input (SC-001)', () => {
         const rawSize = JSON.stringify({ headers: sampleHeaders, body: sampleBody }).length;
         const result = optimizeEmailData(sampleHeaders, sampleBody);
@@ -560,9 +495,7 @@ describe('optimizeEmailData (integration)', () => {
         expect(reductionPercent).toBeGreaterThanOrEqual(50);
     });
 
-    // T020: Performance benchmark (SC-004)
     it('should complete extraction in under 50ms (SC-004)', () => {
-        // Use a large realistic body for stress testing
         const largeBody = ('Hello https://example.com/page ' + 'A'.repeat(100) + '\n').repeat(100);
 
         const start = performance.now();

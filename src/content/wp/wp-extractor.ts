@@ -1,27 +1,10 @@
-/**
- * WP Mail (poczta.wp.pl) email content extractor.
- *
- * Extracts simplified email data from the WP Mail standard message view
- * and raw MIME text from the "Pokaż źródło" (Show source) view.
- */
 
 import type { EmailData, ExtractionResult } from '../../types/email';
 
-/**
- * Extract email content from the WP Mail standard message view.
- *
- * WP Mail renders emails in a reading pane with toolbar buttons above.
- * Selectors target WP's data attributes and semantic class names.
- *
- * @param container - The DOM element containing the email message.
- * @returns An ExtractionResult with simplified EmailData.
- */
 export function extractWpEmailContent(container: HTMLElement): ExtractionResult {
     const warnings: string[] = [];
 
-    // WP Mail DOM selectors update based on new frontend
     
-    // Subject
     let subject = '';
     const subjectEl =
         container.querySelector<HTMLElement>('.textStyle_h1') ||
@@ -29,7 +12,6 @@ export function extractWpEmailContent(container: HTMLElement): ExtractionResult 
         container.querySelector<HTMLElement>('[data-qa="mail-subject"]');
     if (subjectEl) subject = subjectEl.textContent?.trim() || '';
 
-    // From
     let from = '';
     const fromEl = container.querySelector<HTMLElement>('[data-skip-link="mail-info"]') || container.querySelector<HTMLElement>('[data-qa="mail-from"]');
     if (fromEl) {
@@ -43,7 +25,6 @@ export function extractWpEmailContent(container: HTMLElement): ExtractionResult 
         }
     }
 
-    // To
     let to: string[] = [];
     const doLabel = Array.from(container.querySelectorAll('div, span')).find(el => el.textContent?.trim() === 'Do:');
     if (doLabel && doLabel.nextElementSibling) {
@@ -58,20 +39,17 @@ export function extractWpEmailContent(container: HTMLElement): ExtractionResult 
         if (toEl && toEl.textContent) to.push(toEl.textContent.trim());
     }
 
-    // Body
     let bodyText = '';
     const bodyEl = container.querySelector<HTMLElement>('[data-message-body="true"]') || container.querySelector<HTMLElement>('.mail-body');
     if (bodyEl) {
         bodyText = bodyEl.innerHTML?.trim() || bodyEl.innerText?.trim() || bodyEl.textContent?.trim() || '';
     }
 
-    // Date
     let date = new Date().toLocaleString();
     const dateEl = container.querySelector<HTMLElement>('[data-qa="mail-date"]') || container.querySelector<HTMLElement>('.dateTime');
     if (dateEl) {
         date = dateEl.textContent?.trim() || date;
     } else {
-        // Try finding a nowrap div with a year or date structure
         const nowraps = Array.from(container.querySelectorAll('.white-space_nowrap'));
         for (const el of nowraps) {
             const text = el.textContent?.trim() || '';
@@ -105,16 +83,7 @@ export function extractWpEmailContent(container: HTMLElement): ExtractionResult 
     };
 }
 
-/**
- * Extract raw email source from WP's "Pokaż źródło" (Show source) view.
- *
- * The raw view typically displays the MIME payload in a <pre> or
- * dedicated container element.
- *
- * @returns The raw text content of the email, or empty string if not found.
- */
 export function extractWpRawContent(): string {
-    // Ensure we are grabbing the pre inside the raw message modal if it exists
     const modalTitle = Array.from(document.querySelectorAll('.modal__title')).find(h => h.textContent?.trim() === 'Źródło wiadomości');
     if (modalTitle && modalTitle.parentElement) {
         const modalPre = modalTitle.parentElement.querySelector('pre');
@@ -124,7 +93,6 @@ export function extractWpRawContent(): string {
     const pre = document.querySelector<HTMLElement>('pre');
     if (pre) return pre.textContent || '';
 
-    // Fallback: look for a dedicated source container
     const sourceContainer =
         document.querySelector<HTMLElement>('.messageSource') ||
         document.querySelector<HTMLElement>('[data-qa="mail-source"]');

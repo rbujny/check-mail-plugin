@@ -1,8 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { extractEmailContent } from '../email-extractor';
 
-// JSDOM doesn't implement innerText, so we mock it specifically
-// for HTMLElement prototype to return textContent as a reasonable approximation for tests.
 if (!Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerText')) {
     Object.defineProperty(HTMLElement.prototype, 'innerText', {
         get() {
@@ -49,7 +47,6 @@ describe('email-extractor', () => {
             </div>
         `;
 
-        // Subject is extracted from document global scope usually
         const subjectEl = document.createElement('h2');
         subjectEl.className = 'hP';
         subjectEl.textContent = 'Test Subject Line';
@@ -113,7 +110,6 @@ describe('email-extractor', () => {
 
         expect(result.data.bodyText).toContain('suspicious link (https://example.com/phish)');
         expect(result.data.bodyText).toContain('https://google.com');
-        // It shouldn't double up if text == href
         expect(result.data.bodyText).not.toContain('https://google.com (https://google.com)');
     });
 

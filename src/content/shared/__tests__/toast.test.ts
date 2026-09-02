@@ -5,7 +5,6 @@ describe('toast UI component', () => {
     beforeEach(() => {
         document.body.innerHTML = '';
         vi.useFakeTimers();
-        // Mock requestAnimationFrame
         vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
             return setTimeout(() => callback(Date.now()), 16);
         });
@@ -23,7 +22,7 @@ describe('toast UI component', () => {
         const toast = document.querySelector('div');
         expect(toast).not.toBeNull();
         expect(toast?.textContent).toBe(message);
-        expect(toast?.style.backgroundColor).toBe('rgb(211, 47, 47)'); // #d32f2f
+        expect(toast?.style.backgroundColor).toBe('rgb(211, 47, 47)');
     });
 
     it('should fade in the toast using requestAnimationFrame', async () => {
@@ -32,9 +31,8 @@ describe('toast UI component', () => {
 
         expect(toast.style.opacity).toBe('0');
 
-        // requestAnimationFrame is nested twice in toast.ts
-        vi.advanceTimersByTime(16); // First RAF
-        vi.advanceTimersByTime(16); // Second RAF
+        vi.advanceTimersByTime(16);
+        vi.advanceTimersByTime(16);
 
         expect(toast.style.opacity).toBe('1');
     });
@@ -44,11 +42,9 @@ describe('toast UI component', () => {
         const toast = document.querySelector('div')!;
         expect(document.body.contains(toast)).toBe(true);
 
-        // Advance 5 seconds to trigger fade out
         vi.advanceTimersByTime(5000);
         expect(toast.style.opacity).toBe('0');
 
-        // Advance 300ms for the removal timeout
         vi.advanceTimersByTime(300);
         expect(document.body.contains(toast)).toBe(false);
     });

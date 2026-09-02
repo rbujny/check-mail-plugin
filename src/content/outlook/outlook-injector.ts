@@ -4,23 +4,15 @@ import { optimizeEmailData } from '../shared/email-data-optimizer';
 import { extractBodyFromMime } from '../../utils/mime-parser';
 import { decodeQuotedPrintable } from '../../utils/sanitizer';
 
-/** Size threshold for payload warning (5 MB) */
 const SIZE_WARNING_THRESHOLD = 5 * 1024 * 1024;
 
-// --- Standard View ---
-
-/**
- * Finds the Outlook message toolbar.
- */
 function findOutlookToolbar(): HTMLElement | null {
-    // Look for command bars by role or common test IDs
     const toolbar = document.querySelector<HTMLElement>('[data-testid="CommandBar"]') ||
         document.querySelector<HTMLElement>('[role="toolbar"]') ||
         document.querySelector<HTMLElement>('.ms-CommandBar');
 
     if (toolbar) return toolbar;
 
-    // Fallback: Look for the Reply icon's button container (language-agnostic)
     const replyIcon = document.querySelector('[data-icon-name="Reply"]') ||
         document.querySelector('[data-icon-name="ReplyAll"]') ||
         document.querySelector('.ms-Icon--Reply');
@@ -28,9 +20,6 @@ function findOutlookToolbar(): HTMLElement | null {
     return replyIcon?.closest('button')?.parentElement as HTMLElement | null;
 }
 
-/**
- * Creates the shield button for standard view.
- */
 function createStandardShieldButton(): HTMLButtonElement {
     const button = document.createElement('button');
     button.setAttribute(ICON_MARKER, 'true');
@@ -76,7 +65,6 @@ function createStandardShieldButton(): HTMLButtonElement {
         button.style.color = '#1a73e8';
 
         try {
-            // Scope lookup to the active message container if possible to avoid collisions
             const container = document.querySelector('[role="main"]') as HTMLElement || document.body;
             const result = extractOutlookEmailContent(container);
 
@@ -119,15 +107,12 @@ export function injectOutlookStandardIcon(): void {
     }
 }
 
-// --- Raw View ---
-
 function createRawShieldButton(): HTMLButtonElement {
     const button = document.createElement('button');
     button.setAttribute(ICON_MARKER, 'raw');
     button.setAttribute('title', 'Extract Raw Original');
     button.innerHTML = `${SHIELD_ICON_SVG}<span style="margin-left: 8px;">${chrome.i18n.getMessage("scanButtonText")}</span>`;
 
-    // Modern Fluent UI Primary/Ghost button hybrid style
     Object.assign(button.style, {
         background: '#ffffff',
         color: '#1a73e8',
@@ -165,7 +150,6 @@ function createRawShieldButton(): HTMLButtonElement {
             const rawText = extractOutlookRawContent();
             if (!rawText) throw new Error('No raw text found in dialog');
 
-            // 5 MB threshold warning (FR-008)
             const rawSize = new Blob([rawText]).size;
             if (rawSize > SIZE_WARNING_THRESHOLD) {
                 console.warn(
@@ -200,12 +184,9 @@ export function injectOutlookRawIcon(): void {
 
     const dialogs = document.querySelectorAll('[role="dialog"]');
     for (const dialog of Array.from(dialogs)) {
-        // Confirm it's the message source dialog
         if (dialog.textContent?.includes('Received:') ||
             dialog.textContent?.includes('Authentication-Results:')) {
 
-            // Find the footer actions container
-            // fui-DialogActions is standard Fluent UI 9, ms-Dialog-actions is Fluent UI 8
             const footer = dialog.querySelector('.fui-DialogActions') ||
                 dialog.querySelector('.ms-Dialog-actions') ||
                 dialog.querySelector('footer') ||
@@ -213,7 +194,6 @@ export function injectOutlookRawIcon(): void {
 
             if (footer) {
                 const btn = createRawShieldButton();
-                // Prepend so it's to the left of "Close"
                 footer.insertBefore(btn, footer.firstChild);
             }
             return;

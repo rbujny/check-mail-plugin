@@ -5,20 +5,10 @@ import { decodeQuotedPrintable } from '../../../utils/sanitizer';
 import { extractBodyFromMime } from '../../../utils/mime-parser';
 import type { ExtendedEmailData } from '../../../types/email';
 
-/**
- * Finds the native toolbar in the Show Original view.
- * Usually a table cell (.ma a) or immediate container holding download/print buttons.
- */
 function findActionRow(): HTMLElement | null {
-    // We know we're on Gmail's "Show Original" page (manifest matches view=om).
-    // The page structure is always:  heading → metadata table → download link → raw source.
-    // The download link points to mail.google.com, while "Learn more" links point to support.google.com.
-    // This approach is 100% language-agnostic — no text matching needed.
 
     const allAnchors = Array.from(document.querySelectorAll('a'));
 
-    // Attempt 1: Find a link that points to mail.google.com but is NOT inside the metadata table.
-    // This is always the "Download Original" link regardless of language.
     for (const a of allAnchors) {
         const href = a.getAttribute('href') || '';
         const isGmailLink = href.includes('mail.google.com');
@@ -29,7 +19,6 @@ function findActionRow(): HTMLElement | null {
         }
     }
 
-    // Attempt 2: Find any link outside the table that is NOT a support/help link.
     for (const a of allAnchors) {
         const href = a.getAttribute('href') || '';
         const isInsideTable = a.closest('table') !== null;
@@ -40,7 +29,6 @@ function findActionRow(): HTMLElement | null {
         }
     }
 
-    // Attempt 3: Last resort — look for table cells with multiple action links
     const tds = document.querySelectorAll<HTMLElement>('table tr td');
     for (const td of tds) {
         const links = td.querySelectorAll('a');
@@ -52,9 +40,6 @@ function findActionRow(): HTMLElement | null {
     return null;
 }
 
-/**
- * Attaches the shield to the top bar on the Show Original page.
- */
 function createShieldButton(): HTMLButtonElement {
     const button = document.createElement('button');
     button.setAttribute(ICON_MARKER, 'true');
@@ -62,7 +47,6 @@ function createShieldButton(): HTMLButtonElement {
     button.setAttribute('aria-label', 'Extract Raw Original');
     button.innerHTML = `${SHIELD_ICON_SVG}<span style="margin-left: 6px; font-size: 13px; font-family: Arial, sans-serif;">${chrome.i18n.getMessage("scanButtonText")}</span>`;
 
-    // Apply raw view specific styling (similar to standard links inside the action row)
     Object.assign(button.style, {
         background: 'none',
         border: 'none',
@@ -72,7 +56,7 @@ function createShieldButton(): HTMLButtonElement {
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: '#222', // Typical link color in original view
+        color: '#222',
         transition: 'color 0.2s ease',
         verticalAlign: 'middle',
     });
@@ -89,12 +73,11 @@ function createShieldButton(): HTMLButtonElement {
         }
     });
 
-    // Handle extraction
     button.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (button.dataset.extracting) return; // Debounce lock
+        if (button.dataset.extracting) return;
 
         button.dataset.extracting = 'true';
         button.style.color = '#1a73e8';
@@ -102,10 +85,8 @@ function createShieldButton(): HTMLButtonElement {
         try {
             const result = extractOriginalContent();
 
-            // Allow synchronous thread offloading visual feedback
             await new Promise(resolve => setTimeout(resolve, 0));
 
-            // Build optimized payload through the data optimizer
             let rawHeaders: Record<string, string | string[]> = {};
             if ('headers' in result.data) {
                 rawHeaders = (result.data as ExtendedEmailData).headers;
@@ -122,20 +103,17 @@ function createShieldButton(): HTMLButtonElement {
                 ? (result.data as ExtendedEmailData).rawBody
                 : result.data.bodyText;
 
-            // Extract the core HTML or Plain text part, discarding MIME boundary wrappers
             const extractedPart = extractBodyFromMime(rawBody);
 
-            // Decode Quoted-Printable format natively
             const decodedBody = decodeQuotedPrintable(extractedPart);
 
             const payload = optimizeEmailData(rawHeaders, decodedBody);
 
             chrome.runtime.sendMessage({ type: 'PROCESS_EMAIL', payload });
 
-            button.style.color = '#34a853'; // success
+            button.style.color = '#34a853';
         } catch (error) {
-            // Unhandled fallbacks
-            button.style.color = '#ea4335'; // error
+            button.style.color = '#ea4335';
             console.error('[CheckMailPlugin] Raw extraction failed:', error);
         } finally {
             setTimeout(() => {
@@ -150,13 +128,13 @@ function createShieldButton(): HTMLButtonElement {
 
 export function injectOriginalIcon(): void {
     if (document.querySelector(`[${ICON_MARKER}]`)) {
-        return; // Already injected
+        return;
     }
 
     const actionRow = findActionRow();
     if (actionRow) {
         const button = createShieldButton();
-        actionRow.appendChild(document.createTextNode(' | ')); // standard separator
+        actionRow.appendChild(document.createTextNode(' | '));
         actionRow.appendChild(button);
     } else {
         console.warn('[CheckMailPlugin] Original View: Action row not found for injection');

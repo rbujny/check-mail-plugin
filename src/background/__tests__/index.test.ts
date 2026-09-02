@@ -23,7 +23,6 @@ vi.hoisted(() => {
     });
 });
 
-// ── Mock auth-client ────────────────────────────────────────────
 const getValidTokenMock = vi.fn<() => Promise<string>>();
 const invalidateTokenMock = vi.fn();
 
@@ -35,7 +34,6 @@ vi.mock('../auth-client', () => ({
 import { processEmailPayload } from '../index';
 import { PROCESS_URL } from '../api-config';
 
-// Mock global fetch
 const fetchMock = vi.fn();
 vi.stubGlobal('fetch', fetchMock);
 
@@ -60,7 +58,6 @@ describe('background service worker', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.useFakeTimers();
-        // Default: getValidToken returns a mock JWT
         getValidTokenMock.mockResolvedValue('mock-jwt-token');
     });
 
@@ -75,9 +72,7 @@ describe('background service worker', () => {
         await vi.runAllTimersAsync();
         await promise;
 
-        // Token must be obtained first
         expect(getValidTokenMock).toHaveBeenCalledTimes(1);
-        // Then fetch must be called
         expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 
@@ -88,21 +83,17 @@ describe('background service worker', () => {
         await vi.runAllTimersAsync();
         await promise;
 
-        // Check badge updates
         expect(chrome.action.setBadgeText).toHaveBeenCalledWith({ text: '⏳', tabId });
         expect(chrome.action.setBadgeBackgroundColor).toHaveBeenCalledWith({ color: '#fbbc04', tabId });
 
-        // Final badge clearing
         expect(chrome.action.setBadgeText).toHaveBeenLastCalledWith({ text: '', tabId });
 
-        // Fetch check: correct URL and Authorization header
         expect(fetchMock).toHaveBeenCalledTimes(1);
         const [url, options] = fetchMock.mock.calls[0];
         expect(url).toContain('/process');
         expect(options.headers['Authorization']).toBe('Bearer mock-jwt-token');
         expect(options.headers['Content-Type']).toBe('application/json');
 
-        // Result forwarded to content script
         expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(tabId, {
             type: 'SHOW_SCAN_RESULT',
             payload: { result: 'OK', comment: 'Safe' }
@@ -118,13 +109,11 @@ describe('background service worker', () => {
 
         expect(fetchMock).toHaveBeenCalledTimes(3);
 
-        // After 3 failed attempts, it should send a toast error
         expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(tabId, {
             type: 'SHOW_TOAST_ERROR',
             message: expect.stringMatching(/transmission failed/i)
         });
 
-        // Badge should still be cleared at the end
         expect(chrome.action.setBadgeText).toHaveBeenLastCalledWith({ text: '', tabId });
     });
 
@@ -138,7 +127,6 @@ describe('background service worker', () => {
         await promise;
 
         expect(fetchMock).toHaveBeenCalledTimes(2);
-        // Result forwarded, no error toast
         expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(tabId, {
             type: 'SHOW_SCAN_RESULT',
             payload: { result: 'WARNING', comment: 'Suspicious' }
@@ -156,27 +144,20 @@ describe('background service worker', () => {
     });
 
     it('should refresh token and retry on 401 Unauthorized', async () => {
-        // First call: 401
         fetchMock.mockResolvedValueOnce({ ok: false, status: 401 });
-        // After token refresh, getValidToken returns a new token
         getValidTokenMock
-            .mockResolvedValueOnce('mock-jwt-token')       // initial
-            .mockResolvedValueOnce('mock-jwt-token-fresh'); // after invalidation
-        // Second fetch: success
+            .mockResolvedValueOnce('mock-jwt-token')
+            .mockResolvedValueOnce('mock-jwt-token-fresh');
         fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({ result: 'OK', comment: 'Fine' }) });
 
         const promise = processEmailPayload(mockPayload, tabId);
         await vi.runAllTimersAsync();
         await promise;
 
-        // invalidateToken must have been called
         expect(invalidateTokenMock).toHaveBeenCalledTimes(1);
-        // getValidToken called twice: initial + refresh
         expect(getValidTokenMock).toHaveBeenCalledTimes(2);
-        // Two fetch calls: 401 + success
         expect(fetchMock).toHaveBeenCalledTimes(2);
 
-        // Result forwarded
         expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(tabId, {
             type: 'SHOW_SCAN_RESULT',
             payload: { result: 'OK', comment: 'Fine' }
@@ -190,16 +171,13 @@ describe('background service worker', () => {
         await vi.runAllTimersAsync();
         await promise;
 
-        // No fetch should have been made
         expect(fetchMock).not.toHaveBeenCalled();
 
-        // Toast error sent
         expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(tabId, {
             type: 'SHOW_TOAST_ERROR',
             message: expect.stringMatching(/transmission failed/i)
         });
 
-        // Badge cleared
         expect(chrome.action.setBadgeText).toHaveBeenLastCalledWith({ text: '', tabId });
     });
 });

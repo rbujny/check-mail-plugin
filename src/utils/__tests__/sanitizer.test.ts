@@ -15,14 +15,13 @@ describe('decodeQuotedPrintable', () => {
     });
 
     it('should decode =XX hex sequences for UTF-8 characters (Polish diacritics)', () => {
-        // "Zażółć gęślą jaźń"
         const input = 'Za=C5=BC=C3=B3=C5=82=C4=87 g=C4=99=C5=9Bl=C4=85 ja=C5=BA=C5=84';
         const expected = 'Zażółć gęślą jaźń';
         expect(decodeQuotedPrintable(input)).toBe(expected);
     });
 
     it('should handle both soft breaks and hex encoding simultaneously', () => {
-        const input = 'Cze=C5=9B=\r\n=C4=87'; // "Cześć" broken mid-word
+        const input = 'Cze=C5=9B=\r\n=C4=87';
         const expected = 'Cześć';
         expect(decodeQuotedPrintable(input)).toBe(expected);
     });
@@ -57,14 +56,12 @@ describe('stripHtml', () => {
     });
 
     it('should decode advanced numeric decimal and hexadecimal HTML entities', () => {
-        // &#8202; is Hair Space, &#x20; is Space, &#x21; is Exclamation
         const input = 'WordA&#8202;WordB&#x20;WordC&#x21;';
         const expected = `WordA\u200AWordB WordC!`.trim();
         expect(stripHtml(input)).toBe(expected);
     });
 
     it('should normalize excessive whitespace', () => {
-        // Include new hair space parsing in the normalization flow
         const input = '  <br>   Hello   <p>   World   </p>  ';
         const expected = 'Hello World';
         expect(stripHtml(input)).toBe(expected);

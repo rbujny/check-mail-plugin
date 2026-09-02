@@ -1,14 +1,3 @@
-/**
- * WP Mail icon injection module for CheckMailPlugin.
- *
- * Responsible for:
- * - Locating the WP Mail toolbar in standard message view
- * - Injecting the CheckMailPlugin shield icon
- * - Providing a floating overlay button on the raw source view
- * - Handling click events with dataset.extracting debounce lock (FR-006)
- * - Brief visual loading state via icon color change (FR-007)
- * - Graceful failure on DOM mismatch (silent console error, never breaks native UI)
- */
 
 import { extractWpEmailContent, extractWpRawContent } from './wp-extractor';
 import { ICON_MARKER, SHIELD_ICON_SVG } from '../gmail/icon-injector';
@@ -16,17 +5,9 @@ import { optimizeEmailData } from '../shared/email-data-optimizer';
 import { extractBodyFromMime } from '../../utils/mime-parser';
 import { decodeQuotedPrintable } from '../../utils/sanitizer';
 
-/** Size threshold for payload warning (5 MB) */
 const SIZE_WARNING_THRESHOLD = 5 * 1024 * 1024;
 
-// ─── Standard View ──────────────────────────────────────────────────
-
-/**
- * Finds the WP Mail message toolbar in the standard view.
- * Targets WP-specific data attributes with semantic fallbacks.
- */
 function findWpToolbar(): HTMLElement | null {
-    // Priority: New WP toolbar selector (button parent)
     const wrapKeyBtn = document.querySelector<HTMLElement>('button[data-wrap-key="reply"], button[data-wrap-key="forward"]');
     if (wrapKeyBtn && wrapKeyBtn.parentElement) {
         return wrapKeyBtn.parentElement;
@@ -39,7 +20,6 @@ function findWpToolbar(): HTMLElement | null {
 
     if (toolbar) return toolbar;
 
-    // Fallback: Look for Reply/Forward buttons and use their parent
     const buttons = document.querySelectorAll<HTMLElement>('button');
     for (const btn of buttons) {
         const text = btn.textContent?.toLowerCase() || '';
@@ -52,9 +32,6 @@ function findWpToolbar(): HTMLElement | null {
     return null;
 }
 
-/**
- * Creates the shield button for the standard WP Mail view.
- */
 function createStandardShieldButton(): HTMLButtonElement {
     const button = document.createElement('button');
     button.setAttribute(ICON_MARKER, 'true');
@@ -92,14 +69,12 @@ function createStandardShieldButton(): HTMLButtonElement {
         }
     });
 
-    // Click handler with dataset.extracting debounce lock (FR-006)
     button.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (button.dataset.extracting) return; // Debounce lock (FR-006)
+        if (button.dataset.extracting) return;
 
-        // Brief visual loading state — icon color change (FR-007)
         button.dataset.extracting = 'true';
         button.style.opacity = '1';
         button.style.color = '#1a73e8';
@@ -122,9 +97,9 @@ function createStandardShieldButton(): HTMLButtonElement {
 
             chrome.runtime.sendMessage({ type: 'PROCESS_EMAIL', payload });
 
-            button.style.color = '#34a853'; // success
+            button.style.color = '#34a853';
         } catch (error) {
-            button.style.color = '#ea4335'; // error
+            button.style.color = '#ea4335';
             console.error('[CheckMailPlugin][WP] Extraction failed:', error);
         } finally {
             setTimeout(() => {
@@ -138,10 +113,6 @@ function createStandardShieldButton(): HTMLButtonElement {
     return button;
 }
 
-/**
- * Inject the shield icon into the WP Mail standard view toolbar.
- * Fails gracefully: logs a silent warning if the toolbar is not found.
- */
 export function injectWpStandardIcon(): void {
     if (document.querySelector(`[${ICON_MARKER}]`)) {
         return;
@@ -151,8 +122,6 @@ export function injectWpStandardIcon(): void {
         const toolbar = findWpToolbar();
         if (toolbar) {
             const button = createStandardShieldButton();
-            // Prepend instead of append to prevent the CheckMail button from wrapping 
-            // into the hidden overflow area of WP's responsive toolbar.
             toolbar.insertBefore(button, toolbar.firstChild);
         } else {
             console.warn('[CheckMailPlugin][WP] Standard view: toolbar not found for injection');
@@ -162,14 +131,9 @@ export function injectWpStandardIcon(): void {
     }
 }
 
-// ─── Raw View ("Pokaż źródło") ──────────────────────────────────────
-
-/**
- * Creates a floating overlay button for the raw email source view.
- */
 function createRawShieldButton(): HTMLButtonElement {
     const button = document.createElement('button');
-    button.setAttribute(ICON_MARKER, 'raw'); // Distinct marker for raw view
+    button.setAttribute(ICON_MARKER, 'raw');
     button.setAttribute('title', chrome.i18n.getMessage("scanRawButtonTitle") || 'Extract Raw Original');
     button.setAttribute('aria-label', chrome.i18n.getMessage("scanRawButtonTitle") || 'Extract Raw Original');
     button.innerHTML = `
@@ -190,11 +154,11 @@ function createRawShieldButton(): HTMLButtonElement {
         justifyContent: 'center',
         gap: '8px',
         color: '#344050',
-        height: '40px', // Match standard WP button height
+        height: '40px',
         borderRadius: '6px',
         fontFamily: 'inherit',
         transition: 'all 0.2s ease',
-        flex: '1', // Let it stretch evenly in the footer
+        flex: '1',
     });
 
     button.addEventListener('mouseenter', () => {
@@ -209,14 +173,12 @@ function createRawShieldButton(): HTMLButtonElement {
         }
     });
 
-    // Click handler with dataset.extracting debounce lock (FR-006)
     button.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (button.dataset.extracting) return; // Debounce lock (FR-006)
+        if (button.dataset.extracting) return;
 
-        // Brief visual loading state — icon color change (FR-007)
         button.dataset.extracting = 'true';
         button.style.color = '#1a73e8';
         button.style.borderColor = '#1a73e8';
@@ -225,7 +187,6 @@ function createRawShieldButton(): HTMLButtonElement {
         try {
             const rawText = extractWpRawContent();
 
-            // 5 MB threshold warning
             const rawSize = new Blob([rawText]).size;
             if (rawSize > SIZE_WARNING_THRESHOLD) {
                 console.warn(
@@ -236,7 +197,6 @@ function createRawShieldButton(): HTMLButtonElement {
             const extractedPart = extractBodyFromMime(rawText);
             const decodedBody = decodeQuotedPrintable(extractedPart);
 
-            // Parse raw headers from MIME payload
             const rawHeaders: Record<string, string | string[]> = {};
             const headerEndIndex = rawText.indexOf('\r\n\r\n') !== -1
                 ? rawText.indexOf('\r\n\r\n')
@@ -268,9 +228,9 @@ function createRawShieldButton(): HTMLButtonElement {
             const payload = optimizeEmailData(rawHeaders, decodedBody);
             chrome.runtime.sendMessage({ type: 'PROCESS_EMAIL', payload });
 
-            button.style.color = '#34a853'; // success
+            button.style.color = '#34a853';
         } catch (error) {
-            button.style.color = '#ea4335'; // error
+            button.style.color = '#ea4335';
             console.error('[CheckMailPlugin][WP] Raw extraction failed:', error);
         } finally {
             setTimeout(() => {
@@ -285,17 +245,12 @@ function createRawShieldButton(): HTMLButtonElement {
     return button;
 }
 
-/**
- * Inject a floating extraction button in the WP raw source view.
- * Fails gracefully: logs a silent error if injection fails.
- */
 export function injectWpRawIcon(): void {
     const modalTitle = Array.from(document.querySelectorAll('.modal__title')).find(h => h.textContent?.trim() === 'Źródło wiadomości');
     const legacyPre = document.querySelector('pre');
     const isLegacyRaw = window.location.href.includes('view=source') || (legacyPre && legacyPre.textContent?.includes('Received:'));
 
     if (!modalTitle && !isLegacyRaw) {
-        // Cleanup if modal was closed
         const existing = document.querySelector(`[${ICON_MARKER}="raw"]`);
         if (existing) existing.remove();
         return;
@@ -311,14 +266,11 @@ export function injectWpRawIcon(): void {
         const modalFooter = modalTitle?.closest('div[role="dialog"], .modal')?.querySelector('.modal-footer, .modal__footer') as HTMLElement;
 
         if (modalFooter) {
-            // Reconfigure the footer layout to place two buttons side-by-side nicely
             modalFooter.style.display = 'flex';
             modalFooter.style.gap = '12px';
 
-            // Wstawiamy nasz przycisk na sam początek (przed Zamknij)
             modalFooter.insertBefore(button, modalFooter.firstChild);
         } else {
-            // Legacy fallback if modal footer is missing or full page
             Object.assign(button.style, {
                 position: 'fixed',
                 top: '20px',
