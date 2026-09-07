@@ -32,7 +32,7 @@
     "description": "Title in the extension popup"
   },
   "popupSubtitle": {
-    "message": "Email Security & Inspection Engine",
+    "message": "Intelligent Phishing Detection",
     "description": "Subtitle in the extension popup"
   },
   "protectionActive": {

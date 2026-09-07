@@ -75,7 +75,7 @@
       <div class="brand-text">
         <div class="brand-title">{t("popupTitle", "CheckMail")}</div>
         <div class="brand-subtitle">
-          {t("popupSubtitle", "Silnik inspekcji i ochrony poczty")}
+          {t("popupSubtitle", "Inteligentna detekcja phishingu")}
         </div>
       </div>
     </div>
