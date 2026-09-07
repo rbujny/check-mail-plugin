@@ -13,7 +13,7 @@ A privacy-focused browser extension that extracts and optimizes email data for s
   - **Interia Mail** 🇵🇱: Polish provider support for `poczta.interia.pl` — standard and raw source extraction.
 - **Privacy First**: All processing happens locally. Emails are optimized (stripped of signatures and tracking headers, truncated for LLM analysis) before leaving the browser.
 - **Security Analysis Ready**: Extracts SPF/DKIM/DMARC verdicts and the full `Received` chain from raw views.
-- **Inspection Depth & Security Profiles**: Built-in extension popup interface enabling users to configure the email verification depth (`Balanced`, `Express`, or `Deep Inspection`) with persistent storage across all email providers.
+- **Operating Modes Hub**: Built-in extension popup interface enabling users to configure the email verification mode (`Default`, `Fast`, or `Advanced`) with persistent storage across all email providers.
 - **Payload Safety**: Handles large payloads (>5MB) with warnings and debounces extractions to prevent browser lag.
 - **Universal Notification System**: Injects modern, shadow-DOM encapsulated UI overlays (Toast/Modals) across all supported email providers to display scan results (`OK`, `WARNING`, `PHISHING`) without conflicting with native website CSS.
 - **Internationalization (I18n)**: Fully supports multi-language UI via browser native `_locales` (currently `en` and `pl`), automatically adjusting button texts and alert modals based on the user's browser language.
@@ -56,12 +56,12 @@ A privacy-focused browser extension that extracts and optimizes email data for s
 
 ## Usage
 
-### Extension Popup & Security Profiles
-- Click the **CheckMail icon** in your browser's extensions toolbar to open the security control panel.
-- Configure your preferred email inspection depth:
-  - **Balanced (Recommended)**: Two-tier verification (~1.2s latency). Real-time deterministic heuristics backed by contextual anomaly detection.
-  - **Express**: High-speed validation (< 0.8s latency) of routing hops, authentication records (SPF/DKIM/DMARC), and known fraud signatures.
-  - **Deep Inspection**: Exhaustive semantic analysis (~2.5s latency) for targeted spear-phishing, credential harvesting, and deceptive domain spoofing.
+### Extension Popup & Operating Modes
+- Click the **CheckMail icon** in your browser's extensions toolbar to open the control panel.
+- Select your preferred email verification mode:
+  - **Default (Recommended)**: Automatic selection by backend server (optimized for speed).
+  - **Fast**: Ultra-fast classification, lowest response time for everyday checks.
+  - **Advanced**: Deeper contextual analysis and higher detection precision for complex threats.
 - Preferences are saved automatically to local storage and applied across all supported email clients.
 
 ### Gmail

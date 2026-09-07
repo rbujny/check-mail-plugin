@@ -10,9 +10,8 @@ export interface ModelOptionDefinition {
     nameKey: string;
     descriptionKey: string;
     badgeKey?: string;
-    latencyKey?: string;
+    badgeType?: 'auto' | 'speed' | 'smart';
     isRecommended?: boolean;
-    modeTag?: 'balanced' | 'express' | 'deep';
 }
 
 export const AVAILABLE_MODEL_OPTIONS: ModelOptionDefinition[] = [
@@ -21,9 +20,8 @@ export const AVAILABLE_MODEL_OPTIONS: ModelOptionDefinition[] = [
         nameKey: 'modelOptionDefaultName',
         descriptionKey: 'modelOptionDefaultDesc',
         badgeKey: 'modelOptionDefaultBadge',
-        latencyKey: 'modelOptionDefaultLatency',
+        badgeType: 'auto',
         isRecommended: true,
-        modeTag: 'balanced',
     },
     {
         id: 'gemini-3.5-flash-lite',
@@ -31,8 +29,7 @@ export const AVAILABLE_MODEL_OPTIONS: ModelOptionDefinition[] = [
         nameKey: 'modelOptionFlashLiteName',
         descriptionKey: 'modelOptionFlashLiteDesc',
         badgeKey: 'modelOptionFlashLiteBadge',
-        latencyKey: 'modelOptionFlashLiteLatency',
-        modeTag: 'express',
+        badgeType: 'speed',
     },
     {
         id: 'gemini-3.7-flash',
@@ -40,10 +37,10 @@ export const AVAILABLE_MODEL_OPTIONS: ModelOptionDefinition[] = [
         nameKey: 'modelOptionFlashName',
         descriptionKey: 'modelOptionFlashDesc',
         badgeKey: 'modelOptionFlashBadge',
-        latencyKey: 'modelOptionFlashLatency',
-        modeTag: 'deep',
+        badgeType: 'smart',
     },
 ];
+
 
 
 export function isValidRuntimeModel(value: unknown): value is RuntimeModel {

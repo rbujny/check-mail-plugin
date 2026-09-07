@@ -40,65 +40,54 @@
     "description": "Status ochrony"
   },
   "modelSelectionTitle": {
-    "message": "Poziom inspekcji wiadomości",
-    "description": "Nagłówek sekcji wyboru trybu inspekcji"
+    "message": "Tryb działania",
+    "description": "Nagłówek sekcji wyboru trybu działania"
   },
   "modelSelectionSubtitle": {
-    "message": "Dostosuj rygor weryfikacji nagłówków, reputacji i socjotechniki",
-    "description": "Opis sekcji wyboru trybu inspekcji"
+    "message": "Wybierz tryb weryfikacji wiadomości",
+    "description": "Opis sekcji wyboru trybu działania"
   },
   "modelOptionDefaultName": {
-    "message": "Zrównoważony",
-    "description": "Nazwa trybu zrównoważonego"
+    "message": "Domyślny",
+    "description": "Nazwa trybu domyślnego"
   },
   "modelOptionDefaultDesc": {
-    "message": "Dwuetapowa weryfikacja. Reguły heurystyczne wsparte kontekstową analizą anomalii.",
-    "description": "Opis trybu zrównoważonego"
+    "message": "Automatyczny dobór przez serwer (zoptymalizowany pod kątem szybkości)",
+    "description": "Opis trybu domyślnego"
   },
   "modelOptionDefaultBadge": {
     "message": "Zalecany",
-    "description": "Badge trybu zrównoważonego"
-  },
-  "modelOptionDefaultLatency": {
-    "message": "~1.2s",
-    "description": "Szacowany czas weryfikacji w trybie zrównoważonym"
+    "description": "Badge trybu domyślnego"
   },
   "modelOptionFlashLiteName": {
-    "message": "Ekspresowy",
-    "description": "Nazwa trybu ekspresowego"
+    "message": "Szybki",
+    "description": "Nazwa trybu szybkiego"
   },
   "modelOptionFlashLiteDesc": {
-    "message": "Błyskawiczna weryfikacja rekordów SPF/DKIM/DMARC oraz znanych sygnatur phishingu.",
-    "description": "Opis trybu ekspresowego"
+    "message": "Błyskawiczna klasyfikacja, najkrótszy czas odpowiedzi",
+    "description": "Opis trybu szybkiego"
   },
   "modelOptionFlashLiteBadge": {
-    "message": "< 0.8s",
-    "description": "Badge trybu ekspresowego"
-  },
-  "modelOptionFlashLiteLatency": {
-    "message": "< 0.8s",
-    "description": "Szacowany czas weryfikacji w trybie ekspresowym"
+    "message": "Ekspresowy",
+    "description": "Badge trybu szybkiego"
   },
   "modelOptionFlashName": {
-    "message": "Głęboka inspekcja",
-    "description": "Nazwa trybu głębokiej inspekcji"
+    "message": "Zaawansowany",
+    "description": "Nazwa trybu zaawansowanego"
   },
   "modelOptionFlashDesc": {
-    "message": "Zaawansowana inspekcja socjotechniki, manipulacji subdomenami oraz ukrytych wektorów ataku.",
-    "description": "Opis trybu głębokiej inspekcji"
+    "message": "Głębsza analiza kontekstowa, wyższa precyzja wykrywania",
+    "description": "Opis trybu zaawansowanego"
   },
   "modelOptionFlashBadge": {
-    "message": "Maksymalny rygor",
-    "description": "Badge trybu głębokiej inspekcji"
-  },
-  "modelOptionFlashLatency": {
-    "message": "~2.5s",
-    "description": "Szacowany czas weryfikacji w trybie głębokiej inspekcji"
+    "message": "Precyzyjny",
+    "description": "Badge trybu zaawansowanego"
   },
   "settingsSaved": {
-    "message": "Parametry silnika zaktualizowane",
-    "description": "Informacja o pomyślnej aktualizacji konfiguracji"
+    "message": "Zapisano tryb działania",
+    "description": "Informacja o pomyślnej aktualizacji trybu"
   },
+
   "supportedProviders": {
     "message": "Zabezpiecza: Gmail, Outlook, Yahoo, WP, Onet, Interia",
     "description": "Lista obsługiwanych serwisów pocztowych"

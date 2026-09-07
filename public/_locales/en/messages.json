@@ -40,65 +40,54 @@
     "description": "Protection status label"
   },
   "modelSelectionTitle": {
-    "message": "Inspection Depth",
-    "description": "Inspection depth section header"
+    "message": "Operating Mode",
+    "description": "Operating mode section header"
   },
   "modelSelectionSubtitle": {
-    "message": "Configure verification depth for headers, reputation, and social engineering",
-    "description": "Inspection depth section description"
+    "message": "Select email verification mode",
+    "description": "Operating mode section description"
   },
   "modelOptionDefaultName": {
-    "message": "Balanced",
-    "description": "Balanced mode title"
+    "message": "Default",
+    "description": "Default mode title"
   },
   "modelOptionDefaultDesc": {
-    "message": "Two-tier verification. Real-time deterministic heuristics backed by contextual anomaly detection.",
-    "description": "Balanced mode description"
+    "message": "Automatic selection by server (optimized for speed)",
+    "description": "Default mode description"
   },
   "modelOptionDefaultBadge": {
     "message": "Recommended",
-    "description": "Balanced mode badge"
-  },
-  "modelOptionDefaultLatency": {
-    "message": "~1.2s",
-    "description": "Balanced mode estimated latency"
+    "description": "Default mode badge"
   },
   "modelOptionFlashLiteName": {
-    "message": "Express",
-    "description": "Express mode name"
+    "message": "Fast",
+    "description": "Fast mode name"
   },
   "modelOptionFlashLiteDesc": {
-    "message": "Rapid validation of SPF/DKIM/DMARC authentication records and known fraud signatures.",
-    "description": "Express mode description"
+    "message": "Ultra-fast classification, lowest response time",
+    "description": "Fast mode description"
   },
   "modelOptionFlashLiteBadge": {
-    "message": "< 0.8s",
-    "description": "Express mode badge"
-  },
-  "modelOptionFlashLiteLatency": {
-    "message": "< 0.8s",
-    "description": "Express mode estimated latency"
+    "message": "Express",
+    "description": "Fast mode badge"
   },
   "modelOptionFlashName": {
-    "message": "Deep Inspection",
-    "description": "Deep inspection mode name"
+    "message": "Advanced",
+    "description": "Advanced mode name"
   },
   "modelOptionFlashDesc": {
-    "message": "Exhaustive semantic analysis for targeted spear-phishing, credential harvesting, and deceptive domain spoofing.",
-    "description": "Deep inspection mode description"
+    "message": "Deeper contextual analysis, higher detection precision",
+    "description": "Advanced mode description"
   },
   "modelOptionFlashBadge": {
-    "message": "Maximum Rigor",
-    "description": "Deep inspection mode badge"
-  },
-  "modelOptionFlashLatency": {
-    "message": "~2.5s",
-    "description": "Deep inspection mode estimated latency"
+    "message": "Precise",
+    "description": "Advanced mode badge"
   },
   "settingsSaved": {
-    "message": "Inspection engine updated",
+    "message": "Operating mode saved",
     "description": "Saved confirmation message"
   },
+
   "supportedProviders": {
     "message": "Secures: Gmail, Outlook, Yahoo, WP, Onet, Interia",
     "description": "Supported providers list"

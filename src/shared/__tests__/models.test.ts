@@ -31,12 +31,14 @@ describe('models shared module', () => {
             expect(defaultOpt?.isRecommended).toBe(true);
         });
 
-        it('should define latency keys for all modes', () => {
+        it('should define badgeKey and badgeType for all options', () => {
             for (const opt of AVAILABLE_MODEL_OPTIONS) {
-                expect(opt.latencyKey).toBeDefined();
+                expect(opt.badgeKey).toBeDefined();
+                expect(opt.badgeType).toBeDefined();
             }
         });
     });
+
 
 
     describe('isValidRuntimeModel', () => {

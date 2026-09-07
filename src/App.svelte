@@ -147,21 +147,18 @@
           <div class="card-body">
             <div class="card-title-row">
               <span class="card-name">{t(option.nameKey, option.id)}</span>
-              <div class="badge-group">
-                {#if option.latencyKey}
-                  <span class="latency-metric">{t(option.latencyKey, "")}</span>
-                {/if}
-                {#if option.badgeKey}
-                  <span
-                    class="card-badge"
-                    class:badge-recommended={option.isRecommended}
-                    class:badge-standard={!option.isRecommended}
-                  >
-                    {t(option.badgeKey, "")}
-                  </span>
-                {/if}
-              </div>
+              {#if option.badgeKey}
+                <span
+                  class="card-badge"
+                  class:badge-auto={option.badgeType === "auto"}
+                  class:badge-speed={option.badgeType === "speed"}
+                  class:badge-smart={option.badgeType === "smart"}
+                >
+                  {t(option.badgeKey, "")}
+                </span>
+              {/if}
             </div>
+
 
             <p class="card-desc">
               {t(option.descriptionKey, "")}
@@ -397,39 +394,32 @@
     color: #60a5fa;
   }
 
-  .badge-group {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .latency-metric {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-      monospace;
-    font-size: 9.5px;
-    color: #64748b;
-    letter-spacing: -0.2px;
-  }
-
   .card-badge {
     font-size: 9.5px;
     font-weight: 600;
-    padding: 1.5px 5.5px;
+    padding: 2px 6.5px;
     border-radius: 4px;
     letter-spacing: 0.2px;
   }
 
-  .badge-recommended {
-    background: rgba(16, 185, 129, 0.12);
-    color: #34d399;
-    border: 1px solid rgba(16, 185, 129, 0.25);
+  .badge-auto {
+    background: rgba(56, 189, 248, 0.12);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.25);
   }
 
-  .badge-standard {
-    background: rgba(148, 163, 184, 0.08);
-    color: #94a3b8;
-    border: 1px solid rgba(148, 163, 184, 0.18);
+  .badge-speed {
+    background: rgba(245, 158, 11, 0.12);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.25);
   }
+
+  .badge-smart {
+    background: rgba(168, 85, 247, 0.12);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.25);
+  }
+
 
   .card-desc {
     font-size: 10.5px;
