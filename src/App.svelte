@@ -1,19 +1,19 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount } from "svelte";
   import {
     AVAILABLE_MODEL_OPTIONS,
     getSelectedModel,
     setSelectedModel,
     type SelectedModelId,
-  } from './shared/models';
+  } from "./shared/models";
 
-  let selectedModel = $state<SelectedModelId>('default');
+  let selectedModel = $state<SelectedModelId>("default");
   let isSaving = $state(false);
   let showSavedNotice = $state(false);
   let savedNoticeTimer: ReturnType<typeof setTimeout> | null = null;
 
   function t(key: string, fallback: string): string {
-    if (typeof chrome !== 'undefined' && chrome.i18n?.getMessage) {
+    if (typeof chrome !== "undefined" && chrome.i18n?.getMessage) {
       const msg = chrome.i18n.getMessage(key);
       if (msg) return msg;
     }
@@ -24,7 +24,7 @@
     try {
       selectedModel = await getSelectedModel();
     } catch (err) {
-      console.warn('[CheckMail] Error loading selected model:', err);
+      console.warn("[CheckMail] Error loading selected model:", err);
     }
   });
 
@@ -37,7 +37,7 @@
       await setSelectedModel(id);
       showNotice();
     } catch (err) {
-      console.error('[CheckMail] Failed to save model selection:', err);
+      console.error("[CheckMail] Failed to save inspection settings:", err);
     } finally {
       isSaving = false;
     }
@@ -57,42 +57,75 @@
   <header class="popup-header">
     <div class="brand-row">
       <div class="logo-shield">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          <path d="M9 12l2 2 4-4" stroke-width="2.5"/>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <path d="M9 12l2 2 4-4" stroke-width="2.2" />
         </svg>
       </div>
       <div class="brand-text">
-        <div class="brand-title">{t('popupTitle', 'CheckMail')}</div>
-        <div class="brand-subtitle">{t('popupSubtitle', 'Ochrona poczty przed phishingiem')}</div>
+        <div class="brand-title">{t("popupTitle", "CheckMail")}</div>
+        <div class="brand-subtitle">
+          {t("popupSubtitle", "Silnik inspekcji i ochrony poczty")}
+        </div>
       </div>
     </div>
 
-    <div class="status-pill" title={t('protectionActive', 'Ochrona aktywna')}>
+    <div class="status-pill" title={t("protectionActive", "Ochrona aktywna")}>
       <span class="status-dot"></span>
-      <span class="status-label">{t('protectionActive', 'Ochrona aktywna')}</span>
+      <span class="status-label"
+        >{t("protectionActive", "Ochrona aktywna")}</span
+      >
     </div>
   </header>
 
-  <!-- Section: LLM Selection -->
+  <!-- Section: Inspection Depth / Security Modes -->
   <section class="section-container">
     <div class="section-header">
       <div class="section-title-row">
-        <svg class="section-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2a4 4 0 0 1 4 4v1a3 3 0 0 1 3 3v2a3 3 0 0 1-1 2.22V17a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3v-2.78A3 3 0 0 1 5 12V9a3 3 0 0 1 3-3V6a4 4 0 0 1 4-4z"/>
-          <line x1="9" y1="12" x2="9.01" y2="12"/>
-          <line x1="15" y1="12" x2="15.01" y2="12"/>
-          <path d="M10 16a2 2 0 0 0 4 0"/>
+        <svg
+          class="section-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="15"
+          height="15"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polygon points="12 2 2 7 12 12 22 7 12 2" />
+          <polyline points="2 17 12 22 22 17" />
+          <polyline points="2 12 12 17 22 12" />
         </svg>
-        <h2 class="section-title">{t('modelSelectionTitle', 'Model analizy LLM')}</h2>
+        <h2 class="section-title">
+          {t("modelSelectionTitle", "Poziom inspekcji wiadomości")}
+        </h2>
       </div>
       <p class="section-description">
-        {t('modelSelectionSubtitle', 'Wybierz model AI analizujący treść i nagłówki')}
+        {t(
+          "modelSelectionSubtitle",
+          "Dostosuj rygor weryfikacji nagłówków, reputacji i socjotechniki",
+        )}
       </p>
     </div>
 
-    <!-- Models List Cards -->
-    <div class="options-list" role="radiogroup" aria-label={t('modelSelectionTitle', 'Model analizy LLM')}>
+    <!-- Security Mode Cards -->
+    <div
+      class="options-list"
+      role="radiogroup"
+      aria-label={t("modelSelectionTitle", "Poziom inspekcji wiadomości")}
+    >
       {#each AVAILABLE_MODEL_OPTIONS as option (option.id)}
         {@const isSelected = selectedModel === option.id}
         <button
@@ -114,20 +147,24 @@
           <div class="card-body">
             <div class="card-title-row">
               <span class="card-name">{t(option.nameKey, option.id)}</span>
-              {#if option.badgeKey}
-                <span
-                  class="card-badge"
-                  class:badge-auto={option.id === 'default'}
-                  class:badge-speed={option.id === 'gemini-3.5-flash-lite'}
-                  class:badge-smart={option.id === 'gemini-3.7-flash'}
-                >
-                  {t(option.badgeKey, '')}
-                </span>
-              {/if}
+              <div class="badge-group">
+                {#if option.latencyKey}
+                  <span class="latency-metric">{t(option.latencyKey, "")}</span>
+                {/if}
+                {#if option.badgeKey}
+                  <span
+                    class="card-badge"
+                    class:badge-recommended={option.isRecommended}
+                    class:badge-standard={!option.isRecommended}
+                  >
+                    {t(option.badgeKey, "")}
+                  </span>
+                {/if}
+              </div>
             </div>
 
             <p class="card-desc">
-              {t(option.descriptionKey, '')}
+              {t(option.descriptionKey, "")}
             </p>
           </div>
         </button>
@@ -135,21 +172,29 @@
     </div>
   </section>
 
-  <!-- Auto-save floating feedback -->
+  <!-- Technical Configuration Feedback -->
   <div class="feedback-row" class:visible={showSavedNotice}>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="14" height="14" fill="currentColor">
-      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-    </svg>
-    <span>{t('settingsSaved', 'Zapisano')}</span>
+    <span class="feedback-dot"></span>
+    <span>{t("settingsSaved", "Parametry silnika zaktualizowane")}</span>
   </div>
 
   <!-- Footer Info -->
   <footer class="popup-footer">
     <div class="providers-row">
-      <span class="providers-text">{t('supportedProviders', 'Obsługa: Gmail, Outlook, Yahoo, WP, Onet, Interia')}</span>
+      <span class="providers-text"
+        >{t(
+          "supportedProviders",
+          "Zabezpiecza: Gmail, Outlook, Yahoo, WP, Onet, Interia",
+        )}</span
+      >
     </div>
     <div class="footer-meta">
-      <span>CheckMail Plugin • {t('versionText', 'Wersja')} 0.1.0</span>
+      <span
+        >CheckMail Core v0.1.0 • {t(
+          "protectionActive",
+          "Ochrona aktywna",
+        )}</span
+      >
     </div>
   </footer>
 </main>
@@ -157,11 +202,11 @@
 <style>
   .popup-container {
     width: 360px;
-    padding: 18px 16px 14px;
+    padding: 16px 16px 12px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    background: linear-gradient(180deg, #0b0f19 0%, #0d1322 100%);
+    gap: 14px;
+    background: #0b0f17;
     box-sizing: border-box;
     user-select: none;
   }
@@ -171,7 +216,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 14px;
+    padding-bottom: 12px;
     border-bottom: 1px solid var(--border-subtle);
   }
 
@@ -182,63 +227,49 @@
   }
 
   .logo-shield {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%);
-    border: 1px solid rgba(56, 189, 248, 0.3);
-    color: #38bdf8;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(37, 99, 235, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    color: #60a5fa;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 16px rgba(14, 165, 233, 0.25);
   }
 
   .brand-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
-    letter-spacing: 0.3px;
-    color: #f8fafc;
+    letter-spacing: 0.2px;
+    color: #f1f5f9;
   }
 
   .brand-subtitle {
     font-size: 11px;
-    color: var(--text-secondary);
+    color: #64748b;
   }
 
   .status-pill {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 9px;
-    border-radius: 12px;
-    background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
   }
 
   .status-dot {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background-color: #10b981;
-    box-shadow: 0 0 8px #10b981;
-    animation: pulse 2s infinite ease-in-out;
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.6;
-      transform: scale(0.85);
-    }
   }
 
   .status-label {
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 10.5px;
+    font-weight: 500;
     color: #34d399;
   }
 
@@ -246,13 +277,13 @@
   .section-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
 
   .section-header {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
   }
 
   .section-title-row {
@@ -262,29 +293,29 @@
   }
 
   .section-icon {
-    color: var(--accent-cyan);
+    color: #60a5fa;
   }
 
   .section-title {
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
     letter-spacing: 0.2px;
-    color: #e2e8f0;
+    color: #cbd5e1;
     margin: 0;
   }
 
   .section-description {
-    font-size: 11.5px;
-    color: var(--text-muted);
+    font-size: 11px;
+    color: #64748b;
     margin: 0;
     line-height: 1.35;
   }
 
-  /* Radio Cards */
+  /* Mode Cards */
   .options-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 7px;
   }
 
   .option-card {
@@ -292,27 +323,26 @@
     align-items: flex-start;
     gap: 10px;
     width: 100%;
-    padding: 10px 12px;
-    border-radius: 9px;
-    background: rgba(17, 24, 39, 0.65);
-    border: 1px solid var(--border-subtle);
+    padding: 9px 11px;
+    border-radius: 8px;
+    background: rgba(17, 24, 39, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.07);
     cursor: pointer;
     text-align: left;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
     outline: none;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 
   .option-card:hover {
-    background: rgba(30, 41, 59, 0.6);
-    border-color: var(--border-hover);
-    transform: translateY(-1px);
+    background: rgba(30, 41, 59, 0.55);
+    border-color: rgba(255, 255, 255, 0.14);
   }
 
   .option-card.selected {
-    background: linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, rgba(30, 58, 138, 0.12) 100%);
-    border-color: #0ea5e9;
-    box-shadow: 0 0 14px rgba(14, 165, 233, 0.15), inset 0 0 0 1px rgba(14, 165, 233, 0.2);
+    background: rgba(37, 99, 235, 0.1);
+    border-color: #2563eb;
   }
 
   .card-radio-box {
@@ -321,27 +351,26 @@
   }
 
   .radio-indicator {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     border: 1.5px solid #475569;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: border-color 0.15s ease;
   }
 
   .radio-indicator.checked {
-    border-color: #38bdf8;
-    background: rgba(14, 165, 233, 0.2);
+    border-color: #3b82f6;
+    background: rgba(37, 99, 235, 0.2);
   }
 
   .radio-inner-dot {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background-color: #38bdf8;
-    box-shadow: 0 0 6px #38bdf8;
+    background-color: #60a5fa;
   }
 
   .card-body {
@@ -359,45 +388,53 @@
   }
 
   .card-name {
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 600;
-    color: #f1f5f9;
+    color: #e2e8f0;
   }
 
   .option-card.selected .card-name {
-    color: #38bdf8;
+    color: #60a5fa;
+  }
+
+  .badge-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .latency-metric {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      monospace;
+    font-size: 9.5px;
+    color: #64748b;
+    letter-spacing: -0.2px;
   }
 
   .card-badge {
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 6px;
+    padding: 1.5px 5.5px;
+    border-radius: 4px;
     letter-spacing: 0.2px;
   }
 
-  .badge-auto {
-    background: rgba(56, 189, 248, 0.15);
-    color: #38bdf8;
-    border: 1px solid rgba(56, 189, 248, 0.3);
+  .badge-recommended {
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.25);
   }
 
-  .badge-speed {
-    background: rgba(245, 158, 11, 0.15);
-    color: #fbbf24;
-    border: 1px solid rgba(245, 158, 11, 0.3);
-  }
-
-  .badge-smart {
-    background: rgba(168, 85, 247, 0.15);
-    color: #c084fc;
-    border: 1px solid rgba(168, 85, 247, 0.3);
+  .badge-standard {
+    background: rgba(148, 163, 184, 0.08);
+    color: #94a3b8;
+    border: 1px solid rgba(148, 163, 184, 0.18);
   }
 
   .card-desc {
-    font-size: 11px;
-    color: var(--text-secondary);
-    line-height: 1.3;
+    font-size: 10.5px;
+    color: #94a3b8;
+    line-height: 1.35;
     margin: 0;
   }
 
@@ -407,18 +444,27 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 5px 10px;
-    border-radius: 6px;
-    background: rgba(16, 185, 129, 0.12);
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 4px 8px;
+    border-radius: 5px;
+    background: rgba(16, 185, 129, 0.06);
+    border: 1px solid rgba(16, 185, 129, 0.15);
     color: #34d399;
-    font-size: 11.5px;
+    font-size: 10.5px;
     font-weight: 500;
     opacity: 0;
-    transform: translateY(4px);
-    transition: all 0.25s ease;
+    transform: translateY(2px);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
     pointer-events: none;
-    min-height: 26px;
+    min-height: 22px;
+  }
+
+  .feedback-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #10b981;
   }
 
   .feedback-row.visible {
@@ -428,21 +474,23 @@
 
   /* Footer */
   .popup-footer {
-    padding-top: 10px;
+    padding-top: 8px;
     border-top: 1px solid var(--border-subtle);
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
     text-align: center;
   }
 
   .providers-text {
-    font-size: 10.5px;
-    color: var(--text-muted);
+    font-size: 10px;
+    color: #475569;
   }
 
   .footer-meta {
-    font-size: 10px;
-    color: #475569;
+    font-size: 9.5px;
+    color: #334155;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      monospace;
   }
 </style>

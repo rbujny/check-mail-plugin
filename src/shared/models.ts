@@ -10,8 +10,9 @@ export interface ModelOptionDefinition {
     nameKey: string;
     descriptionKey: string;
     badgeKey?: string;
+    latencyKey?: string;
     isRecommended?: boolean;
-    tagIcon?: 'auto' | 'flash' | 'brain';
+    modeTag?: 'balanced' | 'express' | 'deep';
 }
 
 export const AVAILABLE_MODEL_OPTIONS: ModelOptionDefinition[] = [
@@ -20,8 +21,9 @@ export const AVAILABLE_MODEL_OPTIONS: ModelOptionDefinition[] = [
         nameKey: 'modelOptionDefaultName',
         descriptionKey: 'modelOptionDefaultDesc',
         badgeKey: 'modelOptionDefaultBadge',
+        latencyKey: 'modelOptionDefaultLatency',
         isRecommended: true,
-        tagIcon: 'auto',
+        modeTag: 'balanced',
     },
     {
         id: 'gemini-3.5-flash-lite',
@@ -29,7 +31,8 @@ export const AVAILABLE_MODEL_OPTIONS: ModelOptionDefinition[] = [
         nameKey: 'modelOptionFlashLiteName',
         descriptionKey: 'modelOptionFlashLiteDesc',
         badgeKey: 'modelOptionFlashLiteBadge',
-        tagIcon: 'flash',
+        latencyKey: 'modelOptionFlashLiteLatency',
+        modeTag: 'express',
     },
     {
         id: 'gemini-3.7-flash',
@@ -37,9 +40,11 @@ export const AVAILABLE_MODEL_OPTIONS: ModelOptionDefinition[] = [
         nameKey: 'modelOptionFlashName',
         descriptionKey: 'modelOptionFlashDesc',
         badgeKey: 'modelOptionFlashBadge',
-        tagIcon: 'brain',
+        latencyKey: 'modelOptionFlashLatency',
+        modeTag: 'deep',
     },
 ];
+
 
 export function isValidRuntimeModel(value: unknown): value is RuntimeModel {
     return typeof value === 'string' && runtimeModelValues.includes(value as RuntimeModel);

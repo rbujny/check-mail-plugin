@@ -32,7 +32,7 @@
     "description": "Tytuł w oknie rozszerzenia"
   },
   "popupSubtitle": {
-    "message": "Ochrona poczty przed phishingiem",
+    "message": "Silnik inspekcji i ochrony poczty",
     "description": "Podtytuł w oknie rozszerzenia"
   },
   "protectionActive": {
@@ -40,60 +40,73 @@
     "description": "Status ochrony"
   },
   "modelSelectionTitle": {
-    "message": "Model analizy LLM",
-    "description": "Nagłówek sekcji wyboru modelu"
+    "message": "Poziom inspekcji wiadomości",
+    "description": "Nagłówek sekcji wyboru trybu inspekcji"
   },
   "modelSelectionSubtitle": {
-    "message": "Wybierz model AI analizujący treść i nagłówki",
-    "description": "Opis sekcji wyboru modelu"
+    "message": "Dostosuj rygor weryfikacji nagłówków, reputacji i socjotechniki",
+    "description": "Opis sekcji wyboru trybu inspekcji"
   },
   "modelOptionDefaultName": {
-    "message": "Domyślny (Zalecany)",
-    "description": "Nazwa opcji domyślnej"
+    "message": "Zrównoważony",
+    "description": "Nazwa trybu zrównoważonego"
   },
   "modelOptionDefaultDesc": {
-    "message": "Automatyczny dobór przez serwer (zoptymalizowany pod kątem szybkości)",
-    "description": "Opis opcji domyślnej"
+    "message": "Dwuetapowa weryfikacja. Reguły heurystyczne wsparte kontekstową analizą anomalii.",
+    "description": "Opis trybu zrównoważonego"
   },
   "modelOptionDefaultBadge": {
-    "message": "Auto",
-    "description": "Badge opcji domyślnej"
+    "message": "Zalecany",
+    "description": "Badge trybu zrównoważonego"
+  },
+  "modelOptionDefaultLatency": {
+    "message": "~1.2s",
+    "description": "Szacowany czas weryfikacji w trybie zrównoważonym"
   },
   "modelOptionFlashLiteName": {
-    "message": "Gemini 3.5 Flash-Lite",
-    "description": "Nazwa Gemini 3.5 Flash-Lite"
+    "message": "Ekspresowy",
+    "description": "Nazwa trybu ekspresowego"
   },
   "modelOptionFlashLiteDesc": {
-    "message": "Błyskawiczna klasyfikacja, najkrótszy czas odpowiedzi",
-    "description": "Opis Gemini 3.5 Flash-Lite"
+    "message": "Błyskawiczna weryfikacja rekordów SPF/DKIM/DMARC oraz znanych sygnatur phishingu.",
+    "description": "Opis trybu ekspresowego"
   },
   "modelOptionFlashLiteBadge": {
-    "message": "Szybki",
-    "description": "Badge Gemini 3.5 Flash-Lite"
+    "message": "< 0.8s",
+    "description": "Badge trybu ekspresowego"
+  },
+  "modelOptionFlashLiteLatency": {
+    "message": "< 0.8s",
+    "description": "Szacowany czas weryfikacji w trybie ekspresowym"
   },
   "modelOptionFlashName": {
-    "message": "Gemini 3.7 Flash",
-    "description": "Nazwa Gemini 3.7 Flash"
+    "message": "Głęboka inspekcja",
+    "description": "Nazwa trybu głębokiej inspekcji"
   },
   "modelOptionFlashDesc": {
-    "message": "Głębsza analiza kontekstowa, wyższa precyzja wykrywania",
-    "description": "Opis Gemini 3.7 Flash"
+    "message": "Zaawansowana inspekcja socjotechniki, manipulacji subdomenami oraz ukrytych wektorów ataku.",
+    "description": "Opis trybu głębokiej inspekcji"
   },
   "modelOptionFlashBadge": {
-    "message": "Precyzyjny",
-    "description": "Badge Gemini 3.7 Flash"
+    "message": "Maksymalny rygor",
+    "description": "Badge trybu głębokiej inspekcji"
+  },
+  "modelOptionFlashLatency": {
+    "message": "~2.5s",
+    "description": "Szacowany czas weryfikacji w trybie głębokiej inspekcji"
   },
   "settingsSaved": {
-    "message": "Zapisano",
-    "description": "Informacja o zapisaniu ustawienia"
+    "message": "Parametry silnika zaktualizowane",
+    "description": "Informacja o pomyślnej aktualizacji konfiguracji"
   },
   "supportedProviders": {
-    "message": "Obsługa: Gmail, Outlook, Yahoo, WP, Onet, Interia",
+    "message": "Zabezpiecza: Gmail, Outlook, Yahoo, WP, Onet, Interia",
     "description": "Lista obsługiwanych serwisów pocztowych"
   },
   "versionText": {
-    "message": "Wersja",
+    "message": "Wersja silnika",
     "description": "Etykieta wersji"
   }
 }
+
 

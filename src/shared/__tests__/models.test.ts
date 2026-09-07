@@ -30,7 +30,14 @@ describe('models shared module', () => {
             const defaultOpt = AVAILABLE_MODEL_OPTIONS.find((opt) => opt.id === 'default');
             expect(defaultOpt?.isRecommended).toBe(true);
         });
+
+        it('should define latency keys for all modes', () => {
+            for (const opt of AVAILABLE_MODEL_OPTIONS) {
+                expect(opt.latencyKey).toBeDefined();
+            }
+        });
     });
+
 
     describe('isValidRuntimeModel', () => {
         it('should validate allowed runtime models', () => {

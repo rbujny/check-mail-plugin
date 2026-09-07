@@ -32,7 +32,7 @@
     "description": "Title in the extension popup"
   },
   "popupSubtitle": {
-    "message": "Email Phishing Protection",
+    "message": "Email Security & Inspection Engine",
     "description": "Subtitle in the extension popup"
   },
   "protectionActive": {
@@ -40,60 +40,73 @@
     "description": "Protection status label"
   },
   "modelSelectionTitle": {
-    "message": "LLM Analysis Model",
-    "description": "Model selection section header"
+    "message": "Inspection Depth",
+    "description": "Inspection depth section header"
   },
   "modelSelectionSubtitle": {
-    "message": "Choose the AI model for inspecting email content & headers",
-    "description": "Model selection section description"
+    "message": "Configure verification depth for headers, reputation, and social engineering",
+    "description": "Inspection depth section description"
   },
   "modelOptionDefaultName": {
-    "message": "Server Default (Recommended)",
-    "description": "Default option title"
+    "message": "Balanced",
+    "description": "Balanced mode title"
   },
   "modelOptionDefaultDesc": {
-    "message": "Automatic selection by backend (optimized for latency)",
-    "description": "Default option description"
+    "message": "Two-tier verification. Real-time deterministic heuristics backed by contextual anomaly detection.",
+    "description": "Balanced mode description"
   },
   "modelOptionDefaultBadge": {
-    "message": "Auto",
-    "description": "Default option badge"
+    "message": "Recommended",
+    "description": "Balanced mode badge"
+  },
+  "modelOptionDefaultLatency": {
+    "message": "~1.2s",
+    "description": "Balanced mode estimated latency"
   },
   "modelOptionFlashLiteName": {
-    "message": "Gemini 3.5 Flash-Lite",
-    "description": "Gemini 3.5 Flash-Lite name"
+    "message": "Express",
+    "description": "Express mode name"
   },
   "modelOptionFlashLiteDesc": {
-    "message": "Ultra-fast classification, lowest response latency",
-    "description": "Gemini 3.5 Flash-Lite description"
+    "message": "Rapid validation of SPF/DKIM/DMARC authentication records and known fraud signatures.",
+    "description": "Express mode description"
   },
   "modelOptionFlashLiteBadge": {
-    "message": "Fast",
-    "description": "Gemini 3.5 Flash-Lite badge"
+    "message": "< 0.8s",
+    "description": "Express mode badge"
+  },
+  "modelOptionFlashLiteLatency": {
+    "message": "< 0.8s",
+    "description": "Express mode estimated latency"
   },
   "modelOptionFlashName": {
-    "message": "Gemini 3.7 Flash",
-    "description": "Gemini 3.7 Flash name"
+    "message": "Deep Inspection",
+    "description": "Deep inspection mode name"
   },
   "modelOptionFlashDesc": {
-    "message": "Deeper contextual analysis, higher detection precision",
-    "description": "Gemini 3.7 Flash description"
+    "message": "Exhaustive semantic analysis for targeted spear-phishing, credential harvesting, and deceptive domain spoofing.",
+    "description": "Deep inspection mode description"
   },
   "modelOptionFlashBadge": {
-    "message": "Precise",
-    "description": "Gemini 3.7 Flash badge"
+    "message": "Maximum Rigor",
+    "description": "Deep inspection mode badge"
+  },
+  "modelOptionFlashLatency": {
+    "message": "~2.5s",
+    "description": "Deep inspection mode estimated latency"
   },
   "settingsSaved": {
-    "message": "Saved",
+    "message": "Inspection engine updated",
     "description": "Saved confirmation message"
   },
   "supportedProviders": {
-    "message": "Supports: Gmail, Outlook, Yahoo, WP, Onet, Interia",
+    "message": "Secures: Gmail, Outlook, Yahoo, WP, Onet, Interia",
     "description": "Supported providers list"
   },
   "versionText": {
-    "message": "Version",
+    "message": "Engine Version",
     "description": "Version label"
   }
 }
+
 
