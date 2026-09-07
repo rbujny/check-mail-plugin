@@ -23,6 +23,13 @@ export interface ExtractionResult {
     rawSize?: number;
 }
 
+export const runtimeModelValues = [
+    'gemini-3.5-flash-lite',
+    'gemini-3.7-flash',
+] as const;
+
+export type RuntimeModel = (typeof runtimeModelValues)[number];
+
 export interface ProcessedEmailData {
     headers: Record<string, string>;
     receivedChain: string[];
@@ -34,4 +41,6 @@ export interface ProcessedEmailData {
     body: string;
     truncated: boolean;
     links: string[];
+    model?: RuntimeModel;
 }
+

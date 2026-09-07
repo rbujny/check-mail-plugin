@@ -26,5 +26,74 @@
   "understoodButtonText": {
     "message": "Zrozumiałem, uważam!",
     "description": "Tekst na przycisku zrozumienia przy phishingu"
+  },
+  "popupTitle": {
+    "message": "CheckMail",
+    "description": "Tytuł w oknie rozszerzenia"
+  },
+  "popupSubtitle": {
+    "message": "Ochrona poczty przed phishingiem",
+    "description": "Podtytuł w oknie rozszerzenia"
+  },
+  "protectionActive": {
+    "message": "Ochrona aktywna",
+    "description": "Status ochrony"
+  },
+  "modelSelectionTitle": {
+    "message": "Model analizy LLM",
+    "description": "Nagłówek sekcji wyboru modelu"
+  },
+  "modelSelectionSubtitle": {
+    "message": "Wybierz model AI analizujący treść i nagłówki",
+    "description": "Opis sekcji wyboru modelu"
+  },
+  "modelOptionDefaultName": {
+    "message": "Domyślny (Zalecany)",
+    "description": "Nazwa opcji domyślnej"
+  },
+  "modelOptionDefaultDesc": {
+    "message": "Automatyczny dobór przez serwer (zoptymalizowany pod kątem szybkości)",
+    "description": "Opis opcji domyślnej"
+  },
+  "modelOptionDefaultBadge": {
+    "message": "Auto",
+    "description": "Badge opcji domyślnej"
+  },
+  "modelOptionFlashLiteName": {
+    "message": "Gemini 3.5 Flash-Lite",
+    "description": "Nazwa Gemini 3.5 Flash-Lite"
+  },
+  "modelOptionFlashLiteDesc": {
+    "message": "Błyskawiczna klasyfikacja, najkrótszy czas odpowiedzi",
+    "description": "Opis Gemini 3.5 Flash-Lite"
+  },
+  "modelOptionFlashLiteBadge": {
+    "message": "Szybki",
+    "description": "Badge Gemini 3.5 Flash-Lite"
+  },
+  "modelOptionFlashName": {
+    "message": "Gemini 3.7 Flash",
+    "description": "Nazwa Gemini 3.7 Flash"
+  },
+  "modelOptionFlashDesc": {
+    "message": "Głębsza analiza kontekstowa, wyższa precyzja wykrywania",
+    "description": "Opis Gemini 3.7 Flash"
+  },
+  "modelOptionFlashBadge": {
+    "message": "Precyzyjny",
+    "description": "Badge Gemini 3.7 Flash"
+  },
+  "settingsSaved": {
+    "message": "Zapisano",
+    "description": "Informacja o zapisaniu ustawienia"
+  },
+  "supportedProviders": {
+    "message": "Obsługa: Gmail, Outlook, Yahoo, WP, Onet, Interia",
+    "description": "Lista obsługiwanych serwisów pocztowych"
+  },
+  "versionText": {
+    "message": "Wersja",
+    "description": "Etykieta wersji"
   }
 }
+
