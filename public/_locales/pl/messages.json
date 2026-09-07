@@ -26,5 +26,76 @@
   "understoodButtonText": {
     "message": "Zrozumiałem, uważam!",
     "description": "Tekst na przycisku zrozumienia przy phishingu"
+  },
+  "popupTitle": {
+    "message": "CheckMail",
+    "description": "Tytuł w oknie rozszerzenia"
+  },
+  "popupSubtitle": {
+    "message": "Inteligentna detekcja phishingu",
+    "description": "Podtytuł w oknie rozszerzenia"
+  },
+  "protectionActive": {
+    "message": "Ochrona aktywna",
+    "description": "Status ochrony"
+  },
+  "modelSelectionTitle": {
+    "message": "Tryb działania",
+    "description": "Nagłówek sekcji wyboru trybu działania"
+  },
+  "modelSelectionSubtitle": {
+    "message": "Wybierz tryb weryfikacji wiadomości",
+    "description": "Opis sekcji wyboru trybu działania"
+  },
+  "modelOptionDefaultName": {
+    "message": "Domyślny",
+    "description": "Nazwa trybu domyślnego"
+  },
+  "modelOptionDefaultDesc": {
+    "message": "Automatyczny dobór przez serwer (zoptymalizowany pod kątem szybkości)",
+    "description": "Opis trybu domyślnego"
+  },
+  "modelOptionDefaultBadge": {
+    "message": "Zalecany",
+    "description": "Badge trybu domyślnego"
+  },
+  "modelOptionFlashLiteName": {
+    "message": "Szybki",
+    "description": "Nazwa trybu szybkiego"
+  },
+  "modelOptionFlashLiteDesc": {
+    "message": "Błyskawiczna klasyfikacja, najkrótszy czas odpowiedzi",
+    "description": "Opis trybu szybkiego"
+  },
+  "modelOptionFlashLiteBadge": {
+    "message": "Ekspresowy",
+    "description": "Badge trybu szybkiego"
+  },
+  "modelOptionFlashName": {
+    "message": "Zaawansowany",
+    "description": "Nazwa trybu zaawansowanego"
+  },
+  "modelOptionFlashDesc": {
+    "message": "Głębsza analiza kontekstowa, wyższa precyzja wykrywania",
+    "description": "Opis trybu zaawansowanego"
+  },
+  "modelOptionFlashBadge": {
+    "message": "Precyzyjny",
+    "description": "Badge trybu zaawansowanego"
+  },
+  "settingsSaved": {
+    "message": "Zapisano tryb działania",
+    "description": "Informacja o pomyślnej aktualizacji trybu"
+  },
+
+  "supportedProviders": {
+    "message": "Zabezpiecza: Gmail, Outlook, Yahoo, WP, Onet, Interia",
+    "description": "Lista obsługiwanych serwisów pocztowych"
+  },
+  "versionText": {
+    "message": "Wersja silnika",
+    "description": "Etykieta wersji"
   }
 }
+
+

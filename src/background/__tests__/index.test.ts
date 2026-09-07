@@ -180,4 +180,55 @@ describe('background service worker', () => {
 
         expect(chrome.action.setBadgeText).toHaveBeenLastCalledWith({ text: '', tabId });
     });
+
+    it('should attach selected model from storage when valid runtime model is set', async () => {
+        (chrome.storage.local.get as any).mockResolvedValueOnce({
+            checkmail_selected_model: 'gemini-3.7-flash',
+        });
+        fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({ result: 'OK', comment: 'Safe' }) });
+
+        const promise = processEmailPayload(mockPayload, tabId);
+        await vi.runAllTimersAsync();
+        await promise;
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        const [, options] = fetchMock.mock.calls[0];
+        const parsedBody = JSON.parse(options.body);
+        expect(parsedBody.model).toBe('gemini-3.7-flash');
+    });
+
+    it('should not attach model field when storage has default or no selection', async () => {
+        (chrome.storage.local.get as any).mockResolvedValueOnce({
+            checkmail_selected_model: 'default',
+        });
+        fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({ result: 'OK', comment: 'Safe' }) });
+
+        const promise = processEmailPayload(mockPayload, tabId);
+        await vi.runAllTimersAsync();
+        await promise;
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        const [, options] = fetchMock.mock.calls[0];
+        const parsedBody = JSON.parse(options.body);
+        expect(parsedBody.model).toBeUndefined();
+    });
+
+    it('should preserve model if already explicitly set on payload', async () => {
+        (chrome.storage.local.get as any).mockResolvedValueOnce({
+            checkmail_selected_model: 'gemini-3.5-flash-lite',
+        });
+        fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({ result: 'OK', comment: 'Safe' }) });
+
+        const payloadWithExplicitModel = { ...mockPayload, model: 'gemini-3.7-flash' };
+        const promise = processEmailPayload(payloadWithExplicitModel, tabId);
+        await vi.runAllTimersAsync();
+        await promise;
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        const [, options] = fetchMock.mock.calls[0];
+        const parsedBody = JSON.parse(options.body);
+        expect(parsedBody.model).toBe('gemini-3.7-flash');
+    });
+
 });
+

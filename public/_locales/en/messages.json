@@ -26,5 +26,76 @@
   "understoodButtonText": {
     "message": "I understand, I'll be careful!",
     "description": "Text on the understood button for phishing"
+  },
+  "popupTitle": {
+    "message": "CheckMail",
+    "description": "Title in the extension popup"
+  },
+  "popupSubtitle": {
+    "message": "Intelligent Phishing Detection",
+    "description": "Subtitle in the extension popup"
+  },
+  "protectionActive": {
+    "message": "Protection Active",
+    "description": "Protection status label"
+  },
+  "modelSelectionTitle": {
+    "message": "Operating Mode",
+    "description": "Operating mode section header"
+  },
+  "modelSelectionSubtitle": {
+    "message": "Select email verification mode",
+    "description": "Operating mode section description"
+  },
+  "modelOptionDefaultName": {
+    "message": "Default",
+    "description": "Default mode title"
+  },
+  "modelOptionDefaultDesc": {
+    "message": "Automatic selection by server (optimized for speed)",
+    "description": "Default mode description"
+  },
+  "modelOptionDefaultBadge": {
+    "message": "Recommended",
+    "description": "Default mode badge"
+  },
+  "modelOptionFlashLiteName": {
+    "message": "Fast",
+    "description": "Fast mode name"
+  },
+  "modelOptionFlashLiteDesc": {
+    "message": "Ultra-fast classification, lowest response time",
+    "description": "Fast mode description"
+  },
+  "modelOptionFlashLiteBadge": {
+    "message": "Express",
+    "description": "Fast mode badge"
+  },
+  "modelOptionFlashName": {
+    "message": "Advanced",
+    "description": "Advanced mode name"
+  },
+  "modelOptionFlashDesc": {
+    "message": "Deeper contextual analysis, higher detection precision",
+    "description": "Advanced mode description"
+  },
+  "modelOptionFlashBadge": {
+    "message": "Precise",
+    "description": "Advanced mode badge"
+  },
+  "settingsSaved": {
+    "message": "Operating mode saved",
+    "description": "Saved confirmation message"
+  },
+
+  "supportedProviders": {
+    "message": "Secures: Gmail, Outlook, Yahoo, WP, Onet, Interia",
+    "description": "Supported providers list"
+  },
+  "versionText": {
+    "message": "Engine Version",
+    "description": "Version label"
   }
 }
+
+

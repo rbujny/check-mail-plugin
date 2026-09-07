@@ -2,6 +2,7 @@
 import type { ProcessedEmailData } from '../shared/types';
 import { getValidToken, invalidateToken } from './auth-client';
 import { PROCESS_URL, withApiKey } from './api-config';
+import { getSelectedModel, isValidRuntimeModel } from '../shared/models';
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'PROCESS_EMAIL' && message.payload) {
@@ -26,6 +27,14 @@ export async function processEmailPayload(payload: ProcessedEmailData, tabId: nu
     try {
         let token = await getValidToken();
 
+        let effectivePayload: ProcessedEmailData = { ...payload };
+        if (!effectivePayload.model) {
+            const selectedModel = await getSelectedModel();
+            if (isValidRuntimeModel(selectedModel)) {
+                effectivePayload.model = selectedModel;
+            }
+        }
+
         while (attempt < maxRetries && !success) {
             attempt++;
             try {
@@ -38,9 +47,10 @@ export async function processEmailPayload(payload: ProcessedEmailData, tabId: nu
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify(payload),
+                    body: JSON.stringify(effectivePayload),
                     signal: controller.signal
                 });
+
 
                 clearTimeout(timeoutId);
 
