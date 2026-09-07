@@ -159,7 +159,6 @@
               {/if}
             </div>
 
-
             <p class="card-desc">
               {t(option.descriptionKey, "")}
             </p>
@@ -419,7 +418,6 @@
     color: #c084fc;
     border: 1px solid rgba(168, 85, 247, 0.25);
   }
-
 
   .card-desc {
     font-size: 10.5px;
