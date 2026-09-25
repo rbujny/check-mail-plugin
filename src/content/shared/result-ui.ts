@@ -6,6 +6,8 @@ export interface ScanResultPayload {
 
 const UI_CONTAINER_ID = 'checkmail-result-container';
 
+let releaseActiveOverlay: (() => void) | null = null;
+
 const ICONS = {
     OK: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>`,
     WARNING: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
@@ -56,6 +58,14 @@ function injectStyles(result: 'OK' | 'WARNING' | 'PHISHING'): string {
             }
             .backdrop {
                 display: none;
+            }
+            .backdrop.active {
+                display: block;
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(17, 24, 39, 0.55);
+                pointer-events: auto;
+                animation: fadeIn 0.2s ease-out forwards;
             }
             .card {
                 background: #ffffff;
@@ -192,6 +202,8 @@ export function showScanResult(payload: ScanResultPayload): void {
     const theme = THEMES[tier as keyof typeof THEMES];
     const iconStr = ICONS[tier as keyof typeof ICONS];
 
+    if (releaseActiveOverlay) releaseActiveOverlay();
+
     const existing = document.getElementById(UI_CONTAINER_ID);
     if (existing) existing.remove();
 
@@ -212,15 +224,15 @@ export function showScanResult(payload: ScanResultPayload): void {
 
     rootBlock.innerHTML = `
         ${injectStyles(tier as 'OK' | 'WARNING' | 'PHISHING')}
-        <div class="backdrop"></div>
-        <div class="card" id="result-card">
+        <div class="backdrop${isModal ? ' active' : ''}"></div>
+        <div class="card" id="result-card" ${isModal ? 'role="alertdialog" aria-modal="true"' : 'role="status"'} aria-labelledby="result-title" aria-describedby="result-comment">
             <div class="header-bar">
                 <div class="icon-box">
                     ${iconStr}
                 </div>
                 <div class="content-box">
-                    <h3 class="title">${chrome.i18n.getMessage(theme.titleKey)}</h3>
-                    ${!isModal ? `<p class="comment">${payload.comment}</p>` : ''}
+                    <h3 class="title" id="result-title">${chrome.i18n.getMessage(theme.titleKey)}</h3>
+                    ${!isModal ? '<p class="comment" id="result-comment"></p>' : ''}
                 </div>
                 ${!isModal ? `
                 <button class="close-icon" id="close-btn">
@@ -230,7 +242,7 @@ export function showScanResult(payload: ScanResultPayload): void {
             </div>
             ${isModal ? `
             <div class="content-wrap">
-                <p class="comment">${payload.comment}</p>
+                <p class="comment" id="result-comment"></p>
             </div>
             <div class="actions">
                 <button class="btn-primary" id="dismiss-btn">${tier === 'PHISHING' ? chrome.i18n.getMessage('understoodButtonText') : chrome.i18n.getMessage('closeButtonText')}</button>
@@ -239,14 +251,22 @@ export function showScanResult(payload: ScanResultPayload): void {
         </div>
     `;
 
+    const commentEl = rootBlock.querySelector('#result-comment');
+    if (commentEl) {
+        commentEl.textContent = typeof payload.comment === 'string' ? payload.comment : '';
+    }
+
     shadow.appendChild(rootBlock);
     document.body.appendChild(hostWrap);
 
     const card = shadow.querySelector('#result-card') as HTMLElement;
     const backdrop = shadow.querySelector('.backdrop');
 
+    let releaseKeyboard: () => void = () => { };
+
     const dismiss = () => {
         if (!card) return;
+        releaseKeyboard();
         card.classList.add('dismissing');
         if (backdrop) {
             (backdrop as HTMLElement).style.animation = 'fadeIn 0.2s ease-in reverse forwards';
@@ -255,8 +275,25 @@ export function showScanResult(payload: ScanResultPayload): void {
     };
 
     if (isModal) {
-        const btn = shadow.querySelector('#dismiss-btn');
-        if (btn) btn.addEventListener('click', dismiss);
+        const btn = shadow.querySelector<HTMLButtonElement>('#dismiss-btn');
+        if (btn) {
+            btn.addEventListener('click', dismiss);
+
+            const keepFocus = (event: KeyboardEvent) => {
+                if (event.key === 'Tab') {
+                    event.preventDefault();
+                    btn.focus();
+                }
+            };
+            document.addEventListener('keydown', keepFocus, true);
+            releaseKeyboard = () => {
+                document.removeEventListener('keydown', keepFocus, true);
+                if (releaseActiveOverlay === releaseKeyboard) releaseActiveOverlay = null;
+            };
+            releaseActiveOverlay = releaseKeyboard;
+
+            btn.focus();
+        }
     } else {
         const closeBtn = shadow.querySelector('#close-btn');
         if (closeBtn) closeBtn.addEventListener('click', dismiss);

@@ -1,8 +1,7 @@
 import { extractOutlookEmailContent, extractOutlookRawContent, parseSMTPHeaders } from './outlook-extractor';
 import { ICON_MARKER, SHIELD_ICON_SVG } from '../gmail/icon-injector';
 import { optimizeEmailData } from '../shared/email-data-optimizer';
-import { extractBodyFromMime } from '../../utils/mime-parser';
-import { decodeQuotedPrintable } from '../../utils/sanitizer';
+import { extractDecodedBody } from '../../utils/mime-parser';
 
 const SIZE_WARNING_THRESHOLD = 5 * 1024 * 1024;
 
@@ -157,8 +156,7 @@ function createRawShieldButton(): HTMLButtonElement {
                 );
             }
 
-            const extractedPart = extractBodyFromMime(rawText);
-            const decodedBody = decodeQuotedPrintable(extractedPart);
+            const decodedBody = extractDecodedBody(rawText);
 
             const rawHeaders = parseSMTPHeaders(rawText);
 

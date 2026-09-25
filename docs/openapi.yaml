@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: CheckMail Plugin Backend API
-  version: 1.1.0
+  version: 1.2.0
   description: >
     API documentation for the CheckMail Plugin backend.
     This API is used by the browser extension to obtain JWT access tokens
@@ -158,7 +158,9 @@ components:
             type: string
         securityVerdicts:
           type: object
-          description: Parsed authentication-results verdicts (SPF, DKIM, DMARC).
+          description: >
+            Verdicts (SPF, DKIM, DMARC) parsed from the topmost Authentication-Results
+            header, i.e. the one added by the receiving server. Lower headers are ignored.
           properties:
             spf:
               type: string
@@ -178,11 +180,19 @@ components:
           description: True if the body was truncated to fit the max length.
         links:
           type: array
-          description: Deduplicated list of URLs (http, https, mailto, data schemes) extracted from the raw email body.
+          description: >
+            Deduplicated list of URLs (http, https, mailto, data schemes) extracted from the raw email body.
+            Longer URLs are truncated and end with "..." so that their total length does not exceed 2048.
           maxItems: 50
           items:
             type: string
             maxLength: 2048
+        model:
+          type: string
+          enum: [gemini-3.5-flash-lite, gemini-3.7-flash]
+          description: >
+            Optional LLM selected by the user in the extension popup.
+            Omitted when the user keeps the default mode, in which case the server chooses the model.
     ProcessResponse:
       type: object
       required:
