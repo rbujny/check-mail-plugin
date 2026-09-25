@@ -1,8 +1,7 @@
 import { extractOriginalContent } from './extractor';
 import { ICON_MARKER, SHIELD_ICON_SVG } from '../icon-injector';
 import { optimizeEmailData } from '../../shared/email-data-optimizer';
-import { decodeQuotedPrintable } from '../../../utils/sanitizer';
-import { extractBodyFromMime } from '../../../utils/mime-parser';
+import { extractDecodedBody } from '../../../utils/mime-parser';
 import type { ExtendedEmailData } from '../../../types/email';
 
 function findActionRow(): HTMLElement | null {
@@ -103,9 +102,7 @@ function createShieldButton(): HTMLButtonElement {
                 ? (result.data as ExtendedEmailData).rawBody
                 : result.data.bodyText;
 
-            const extractedPart = extractBodyFromMime(rawBody);
-
-            const decodedBody = decodeQuotedPrintable(extractedPart);
+            const decodedBody = extractDecodedBody(rawBody, rawHeaders);
 
             const payload = optimizeEmailData(rawHeaders, decodedBody);
 

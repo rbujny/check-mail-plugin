@@ -24,7 +24,7 @@ A privacy-focused browser extension that extracts and optimizes email data for s
 - **Bundler**: Vite + esbuild (for content script modularity)
 - **State Management**: Svelte Runes
 - **Testing**: Vitest + JSDOM
-- **Build**: CRXJS for Manifest V3 integration
+- **Build**: Vite (popup) + esbuild IIFE bundles for content scripts and the service worker (`scripts/build-extension.js`), with a separate Firefox variant (`scripts/build-firefox.js`)
 
 ## Installation & Setup
 
@@ -96,7 +96,7 @@ A privacy-focused browser extension that extracts and optimizes email data for s
 - **Dev mode**: `npm run dev` (starts the Vite dev server)
 - **Type Check**: `npm run check` (runs svelte-check and tsc)
 - **Test**: `npm run test` (Vitest)
-- **Lint**: `npm run lint`
+- **Firefox build**: `npm run build:firefox` (outputs `dist-firefox/`)
 
 ## Project Mission
 

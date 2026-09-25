@@ -107,10 +107,11 @@ Oto dokładna struktura wysyłanego JSON-a (`ProcessedEmailData`):
 |------|-----|------|
 | `headers` | `Object` | Wyłącznie najważniejsze nagłówki nawigacyjne. Klucze są zawsze małymi literami. Obsługiwane klucze to: `from`, `to`, `subject`, `reply-to`, `return-path`. Reszta nagłówków jest odrzucana. |
 | `receivedChain` | `Array<string>` | Tablica łańcuchów znaków zawierająca wszystkie nagłówki `Received:` z oryginalnego maila (określające ścieżkę serwerów, przez które przeszła wiadomość). |
-| `securityVerdicts` | `Object` | Wyciągnięte werdykty bezpieczeństwa na podstawie nagłówka `Authentication-Results`. Może zawierać klucze `spf`, `dkim` i `dmarc` o wartościach takich jak np. `"pass"`, `"fail"`, `"softfail"`, `"none"`. Jeżeli dany werdykt był niedostępny, obiekt będzie pusty. |
-| `body` | `string` | Oczyszczona z HTML-a treść maila (czysty tekst). **Limitowana do max. 1000 znaków.** Wszystkie linki w treści są podmieniane na słowo `[LINK]`, aby zaoszczędzić miejsce, a długie bloki spacji podmieniane na pojedyncze spacje. Jeżeli body zostało ucięte, na końcu dodawany jest znacznik `[TRUNCATED]`. |
+| `securityVerdicts` | `Object` | Wyciągnięte werdykty bezpieczeństwa na podstawie **najwyżej położonego** nagłówka `Authentication-Results` (dodanego przez serwer odbiorcy; niższe nagłówki mogą pochodzić od nadawcy i są ignorowane). Jeżeli mechanizm występuje w nagłówku kilka razy, brane jest pierwsze wystąpienie. Może zawierać klucze `spf`, `dkim` i `dmarc` o wartościach takich jak np. `"pass"`, `"fail"`, `"softfail"`, `"none"`. Jeżeli dany werdykt był niedostępny, obiekt będzie pusty. |
+| `body` | `string` | Oczyszczona z HTML-a treść maila (czysty tekst). **Limitowana do max. 1000 znaków.** W trybie surowym treść jest wcześniej dekodowana zgodnie z nagłówkami wybranej części MIME (`Content-Transfer-Encoding`: Quoted-Printable lub Base64, parametr `charset`). Wszystkie linki w treści są podmieniane na słowo `[LINK]`, aby zaoszczędzić miejsce, a długie bloki spacji podmieniane na pojedyncze spacje. Jeżeli body zostało ucięte, na końcu dodawany jest znacznik `[TRUNCATED]`. |
 | `truncated` | `boolean` | Flaga informująca backend (i ew. model LLM), czy oryginalna treść wiadomości przekraczała 1000 znaków i została sztucznie ucięta. |
-| `links` | `Array<string>` | Wyekstrahowana i pozbawiona duplikatów tablica linków z treści maila. Wyciąga protokoły HTTP/HTTPS, wektory ukryte w `mailto:`, a także próby wstrzyknięcia skryptów przez `data:`. Maksymalnie przesyła do 50 adresów URL. Dodatkowo każdy najdłuższy link jest ograniczany do max. 2048 znaków, by zapobiec atakom "Payload DoS" na złośliwie wydłużonych adresach. |
+| `links` | `Array<string>` | Wyekstrahowana i pozbawiona duplikatów tablica linków z treści maila. Wyciąga protokoły HTTP/HTTPS, wektory ukryte w `mailto:`, a także próby wstrzyknięcia skryptów przez `data:`. Maksymalnie przesyła do 50 adresów URL. Dodatkowo każdy zbyt długi link jest przycinany i kończony wielokropkiem `...` tak, aby łącznie miał max. 2048 znaków, by zapobiec atakom "Payload DoS" na złośliwie wydłużonych adresach. |
+| `model` | `string` (opcjonalne) | Model LLM wybrany przez użytkownika w panelu wtyczki: `"gemini-3.5-flash-lite"` lub `"gemini-3.7-flash"`. Pole jest pomijane, gdy użytkownik pozostawił tryb domyślny — wtedy model dobiera serwer. |
 
 ## Oczekiwana odpowiedź (Response) od serwera
 
@@ -126,7 +127,9 @@ Po przetworzeniu zrzuconego payloadu, backend musi zwrócić odpowiedź JSON, na
 ### Typy zagrożeń (Severity Tiers) obsługiwane przez UI wtyczki:
 1. **`OK`** - Zielony komunikat (Toast) poświadczający absolutne bezpieczeństwo.
 2. **`WARNING`** - Pomarańczowe ostrzeżenie-banner wskazujące na anomalię, wymuszające uwagę przed przeczytaniem.
-3. **`PHISHING`** - Czerwony, dominujący modal z ostrym efektem wizualnym dla całkowicie potwierdzonych złośliwych wiadomości.
+3. **`PHISHING`** - Czerwony, dominujący modal z ostrym efektem wizualnym dla całkowicie potwierdzonych złośliwych wiadomości. Przyciemnione tło blokuje interakcję ze stroną do czasu kliknięcia przycisku potwierdzenia.
+
+Pole `comment` jest wyświetlane wyłącznie jako zwykły tekst (`textContent`) — znaczniki HTML w odpowiedzi nie są interpretowane. Wartość `result` spoza powyższej listy jest traktowana jak `WARNING`.
 
 ## Różnice u poszczególnych dostawców poczty (Min vs Max Case)
 

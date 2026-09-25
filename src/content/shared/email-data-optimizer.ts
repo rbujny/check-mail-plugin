@@ -6,6 +6,10 @@ const MAX_BODY_LENGTH = 1000;
 
 const TRUNCATION_MARKER = ' [TRUNCATED]';
 
+const MAX_URL_LENGTH = 2048;
+
+const URL_TRUNCATION_MARKER = '...';
+
 const URL_PATTERN = /(?:https?:\/\/|mailto:|data:)[a-zA-Z0-9\-._~:/?#\[\]@!$&*+,;=%()]+(?<![.,)])/gi;
 
 const ALLOWED_HEADERS = new Set([
@@ -55,8 +59,9 @@ export function optimizeHeaders(rawHeaders: Record<string, string | string[]>): 
         }
 
         if (lowerKey === 'authentication-results') {
-            const newAuth = toArray(value).join('; ');
-            authResultsRaw = authResultsRaw ? `${authResultsRaw}; ${newAuth}` : newAuth;
+            if (!authResultsRaw) {
+                authResultsRaw = toArray(value)[0] || '';
+            }
             continue;
         }
 
@@ -85,17 +90,17 @@ export function parseSecurityVerdicts(authResultsHeader: string): {
         const trimmed = part.trim().toLowerCase();
 
         const spfMatch = trimmed.match(/\bspf\s*=\s*(\S+)/);
-        if (spfMatch) {
+        if (spfMatch && !verdicts.spf) {
             verdicts.spf = spfMatch[1];
         }
 
         const dkimMatch = trimmed.match(/\bdkim\s*=\s*(\S+)/);
-        if (dkimMatch) {
+        if (dkimMatch && !verdicts.dkim) {
             verdicts.dkim = dkimMatch[1];
         }
 
         const dmarcMatch = trimmed.match(/\bdmarc\s*=\s*(\S+)/);
-        if (dmarcMatch) {
+        if (dmarcMatch && !verdicts.dmarc) {
             verdicts.dmarc = dmarcMatch[1];
         }
     }
@@ -120,7 +125,9 @@ export function optimizeBody(rawBody: string): {
     }
 
     uniqueLinks = uniqueLinks.map(url =>
-        url.length > 2048 ? url.substring(0, 2048) + '...' : url
+        url.length > MAX_URL_LENGTH
+            ? url.substring(0, MAX_URL_LENGTH - URL_TRUNCATION_MARKER.length) + URL_TRUNCATION_MARKER
+            : url
     );
 
     let processedBody = rawBody.replace(URL_PATTERN, '[LINK]');

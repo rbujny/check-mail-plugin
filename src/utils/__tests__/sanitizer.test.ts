@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { decodeQuotedPrintable, stripHtml } from '../sanitizer';
+import { decodeBase64, decodeQuotedPrintable, stripHtml } from '../sanitizer';
 
 describe('decodeQuotedPrintable', () => {
     it('should remove soft line breaks', () => {
@@ -33,6 +33,42 @@ describe('decodeQuotedPrintable', () => {
     it('should not fail on malformed hex sequences', () => {
         const input = "Invalid sequence =ZZ";
         expect(decodeQuotedPrintable(input)).toBe("Invalid sequence =ZZ");
+    });
+
+    it('should preserve characters that were already decoded by the webmail view', () => {
+        const input = 'Zażółć gęślą jaźń =3D 🙂';
+        expect(decodeQuotedPrintable(input)).toBe('Zażółć gęślą jaźń = 🙂');
+    });
+
+    it('should decode bytes using the declared charset (ISO-8859-2)', () => {
+        const input = 'Za=BF=F3=B3=E6';
+        expect(decodeQuotedPrintable(input, 'iso-8859-2')).toBe('Zażółć');
+    });
+
+    it('should fall back to UTF-8 for an unknown charset label', () => {
+        const input = 'Za=C5=BC=C3=B3=C5=82=C4=87';
+        expect(decodeQuotedPrintable(input, 'x-unknown-charset')).toBe('Zażółć');
+    });
+});
+
+describe('decodeBase64', () => {
+    it('should decode UTF-8 text split into several lines', () => {
+        const encoded = Buffer.from('Zażółć gęślą jaźń https://example.com', 'utf-8').toString('base64');
+        const wrapped = encoded.replace(/(.{16})/g, '$1\r\n');
+        expect(decodeBase64(wrapped)).toBe('Zażółć gęślą jaźń https://example.com');
+    });
+
+    it('should decode bytes using the declared charset (ISO-8859-2)', () => {
+        const encoded = Buffer.from([0x5A, 0x61, 0xBF, 0xF3, 0xB3, 0xE6]).toString('base64');
+        expect(decodeBase64(encoded, 'iso-8859-2')).toBe('Zażółć');
+    });
+
+    it('should return the input unchanged when it is not valid Base64', () => {
+        expect(decodeBase64('x')).toBe('x');
+    });
+
+    it('should handle empty input gracefully', () => {
+        expect(decodeBase64('')).toBe('');
     });
 });
 

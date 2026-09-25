@@ -1,9 +1,18 @@
 
-export function decodeQuotedPrintable(input: string): string {
+function decodeBytes(bytes: Uint8Array, charset: string): string {
+    try {
+        return new TextDecoder(charset, { fatal: false }).decode(bytes);
+    } catch (e) {
+        return new TextDecoder('utf-8', { fatal: false }).decode(bytes);
+    }
+}
+
+export function decodeQuotedPrintable(input: string, charset: string = 'utf-8'): string {
     if (!input) return '';
 
     let processed = input.replace(/=\r?\n/g, '');
 
+    const encoder = new TextEncoder();
     const bytes: number[] = [];
     for (let i = 0; i < processed.length; i++) {
         if (processed[i] === '=' && i + 2 < processed.length) {
@@ -14,13 +23,25 @@ export function decodeQuotedPrintable(input: string): string {
                 continue;
             }
         }
-        bytes.push(processed.charCodeAt(i) & 0xFF);
+        const codePoint = processed.codePointAt(i) ?? 0;
+        if (codePoint < 0x80) {
+            bytes.push(codePoint);
+        } else {
+            bytes.push(...encoder.encode(String.fromCodePoint(codePoint)));
+            if (codePoint > 0xFFFF) i++;
+        }
     }
 
+    return decodeBytes(new Uint8Array(bytes), charset);
+}
+
+export function decodeBase64(input: string, charset: string = 'utf-8'): string {
+    if (!input) return '';
+
     try {
-        const uint8Array = new Uint8Array(bytes);
-        const decoder = new TextDecoder('utf-8', { fatal: false });
-        return decoder.decode(uint8Array);
+        const binary = atob(input.replace(/[^A-Za-z0-9+/=]/g, ''));
+        const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+        return decodeBytes(bytes, charset);
     } catch (e) {
         return input;
     }

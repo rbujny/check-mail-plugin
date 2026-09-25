@@ -130,22 +130,24 @@ describe('optimizeHeaders', () => {
         expect(headers['subject']).toBe('Innocent Subject | URGENT: WINNER WINNER CHICKEN DINNER');
     });
 
-    it('should properly merge multiple distinct Authentication-Results headers', () => {
+    it('should use only the topmost Authentication-Results header added by the receiving server', () => {
         const raw: Record<string, string | string[]> = {
             'From': 'alice@example.com',
             'Authentication-Results': [
-                'mx1.spam.com; dkim=fail',
-                'mx2.google.com; spf=pass; dkim=pass; dmarc=none'
+                'mx.google.com; spf=fail; dkim=fail; dmarc=fail',
+                'forged.example.com; spf=pass; dkim=pass; dmarc=pass'
             ],
         };
 
         const { authResultsRaw } = optimizeHeaders(raw);
         const verdicts = parseSecurityVerdicts(authResultsRaw);
 
-        expect(authResultsRaw).toContain('mx1.spam.com; dkim=fail');
-        expect(authResultsRaw).toContain('mx2.google.com; spf=pass; dkim=pass; dmarc=none');
+        expect(authResultsRaw).toBe('mx.google.com; spf=fail; dkim=fail; dmarc=fail');
+        expect(authResultsRaw).not.toContain('forged.example.com');
 
-        expect(verdicts.spf).toBe('pass');
+        expect(verdicts.spf).toBe('fail');
+        expect(verdicts.dkim).toBe('fail');
+        expect(verdicts.dmarc).toBe('fail');
     });
 });
 
@@ -170,6 +172,16 @@ describe('parseSecurityVerdicts', () => {
         expect(verdicts.spf).toBe('softfail');
         expect(verdicts.dkim).toBe('fail');
         expect(verdicts.dmarc).toBe('fail');
+    });
+
+    it('should keep the first result when a mechanism appears more than once', () => {
+        const authResults =
+            'mx.google.com; dkim=fail header.i=@phish.com; dkim=pass header.i=@relay.com; spf=pass';
+
+        const verdicts = parseSecurityVerdicts(authResults);
+
+        expect(verdicts.dkim).toBe('fail');
+        expect(verdicts.spf).toBe('pass');
     });
 
     it('should handle "none" verdicts', () => {
@@ -295,9 +307,16 @@ describe('optimizeBody', () => {
         const { links, truncated } = optimizeBody('Click ' + giantUrl);
 
         expect(links).toHaveLength(1);
-        expect(links[0].length).toBe(2048 + 3);
+        expect(links[0].length).toBe(2048);
         expect(links[0].endsWith('...')).toBe(true);
         expect(truncated).toBe(false);
+    });
+
+    it('should leave URLs of exactly 2048 characters untouched', () => {
+        const url = 'https://example.com/' + 'A'.repeat(2048 - 'https://example.com/'.length);
+        const { links } = optimizeBody('Click ' + url);
+
+        expect(links[0]).toBe(url);
     });
 });
 
